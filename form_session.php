@@ -39,7 +39,7 @@ session_start();
                 } elseif (strlen($data) > 10) {
                     $isDataValid = false;
                     return "*Field must contain less than 10 characters";
-                } elseif (!preg_match("/^[a-zA-Z ]$/", $data)) {
+                } elseif (!preg_match("/^[a-zA-Z ]*$/", $data)) {
                     $isDataValid = false;
                     return "*Only letters and white space are allowed";
                 }
@@ -58,7 +58,7 @@ session_start();
                 } elseif (strlen($data) > 30) {
                     $isDataValid = false;
                     return "*Field must contain less than 30 characters";
-                } elseif (!preg_match("/^[a-zA-Z-'&@() ]$/", $data)) {
+                } elseif (!preg_match("/^[a-zA-Z-'&@() ]*$/", $data)) {
                     $isDataValid = false;
                     return "*Only letters, white spaces and ('-', ''', '&', '@', '(', ')') are allowed";
                 }
