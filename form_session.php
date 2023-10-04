@@ -13,11 +13,12 @@ session_start();
 
 <body>
     <main class="flex">
-        <section class="flex-1 px-6 py-3">
+        <section class="flex-1 px-6 py-2">
             <h1 class="text-4xl font-medium">Add New Clients</h1>
             <?php
-            $fnameErr = $lnameErr = $companyErr = $departmentErr = $websiteErr = $contactMethodErr = $emailErr = $phoneErr = $addressErr = '';
-            $fname = $lname = $company = $department = $website = $contactMethod = $email = $phone = $address = '';
+            $fnameErr = $lnameErr = $companyErr = $departmentErr = $companyTypeErr = $websiteErr = $contactMethodErr = $emailErr = $phoneErr = $addressErr = '';
+            $fname = $lname = $company = $department = $companyType = $website = $email = $phone = $address = '';
+            $contactMethod = array();
             $isDataValid = true;
             function cleanData(&$data)
             {
@@ -136,7 +137,13 @@ session_start();
                 if (isset($_REQUEST['department'])) {
                     $department = $_REQUEST['department'];
                 } else {
-                    $departmentErr = "Select department";
+                    $departmentErr = "*Select department";
+                }
+                if (isset($_REQUEST['companyType'])) {
+                    $companyType = $_REQUEST['companyType'];
+                } else {
+                    $isDataValid = false;
+                    $companyTypeErr = "*Select company type";
                 }
                 $website = $_REQUEST['website'];
                 if ($websiteErr = validateURL($website)) {
@@ -145,7 +152,8 @@ session_start();
                 if (isset($_REQUEST['contactMethod'])) {
                     $contactMethod = $_REQUEST['contactMethod'];
                 } else {
-                    $contactMethodErr = "Select mode of contact";
+                    $isDataValid = false;
+                    $contactMethodErr = "*Select atleast one mode";
                 }
                 $email = $_REQUEST['emailAddress'];
                 if ($emailErr = validateEmail($email)) {
@@ -195,21 +203,40 @@ session_start();
                             class="absolute left-2 top-full text-red-600 text-sm font-medium"><?php echo $departmentErr ?></span>
                     </div>
                 </div>
+                <div class="flex items-center gap-8 !mt-8 !-mb-4">
+                    <p class="text-lg text-gray-500">Company Type:</p>
+                    <div class="flex items-center gap-2">
+                        <input type="radio" name="companyType" id="startup" value="Startup"
+                            class="outline-indigo-600 w-4 h-4 cursor-pointer">
+                        <label for="startup" class="cursor-pointer">Startup</label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="radio" name="companyType" id="sme" value="SME"
+                            class="outline-indigo-600 w-4 h-4 cursor-pointer">
+                        <label for="sme" class="cursor-pointer">SME</label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="radio" name="companyType" id="mnc" value="MNC"
+                            class="outline-indigo-600 w-4 h-4 cursor-pointer">
+                        <label for="mnc" class="cursor-pointer">MNC</label>
+                    </div>
+                    <span class="text-red-600 text-sm font-medium"><?php echo $companyTypeErr ?></span>
+                </div>
                 <div class="relative">
                     <input type="text" name="website" id="website" placeholder="Company's Website URL"
                         class="w-full px-4 py-2 border border-gray-600 rounded outline-indigo-600 placeholder:text-gray-500">
                     <span
                         class="absolute left-2 top-full text-red-600 text-sm font-medium"><?php echo $websiteErr ?></span>
                 </div>
-                <div class="flex items-center gap-8">
-                    <p class="text-lg text-gray-500">Preferred Mode of Contact:</p>
+                <div class="flex items-center gap-8 !mt-8 !-mb-4">
+                    <p class="text-lg text-gray-500">Modes of Contact:</p>
                     <div class="flex items-center gap-2">
-                        <input type="radio" name="contactMethod" id="phone" value="Phone"
+                        <input type="checkbox" name="contactMethod[]" id="phone" value="Phone"
                             class="outline-indigo-600 w-4 h-4 cursor-pointer">
                         <label for="phone" class="cursor-pointer">Phone</label>
                     </div>
                     <div class="flex items-center gap-2">
-                        <input type="radio" name="contactMethod" id="email" value="Email"
+                        <input type="checkbox" name="contactMethod[]" id="email" value="Email"
                             class="outline-indigo-600 w-4 h-4 cursor-pointer">
                         <label for="email" class="cursor-pointer">Email</label>
                     </div>
@@ -249,6 +276,7 @@ session_start();
                         'fname' => $fname,
                         'lname' => $lname,
                         'company' => $company,
+                        'companyType' => $companyType,
                         'department' => $department,
                         'website' => $website,
                         'contactMethod' => $contactMethod,
@@ -264,42 +292,54 @@ session_start();
 
                     foreach ($_SESSION['formData'] as $key => $value) {
                         echo "<div class='bg-white px-4 py-2 rounded-md space-y-2'>
-                    <header class='space-y-1'>
-                        <h3 class='text-xl font-semibold'>{$value["fname"]} {$value["lname"]}</h3>
-                        <div class='flex gap-8'>
-                            <h4>{$value["company"]}</h4>
-                            <p>{$value["department"]}</p>
-                        </div>
-                        <dl class='flex gap-2'>
-                                <dt>Company Website:</dt>
-                                <dd><a href='#' class='text-blue-600'>{$value["website"]}</a></dd>
+                        <header class='space-y-1'>
+                            <h3 class='text-2xl font-semibold flex justify-between'>
+                                <span>{$value['fname']} {$value['lname']}
+                                    <span class='text-base font-medium'>({$value['department']})</span>
+                                </span>
+                                <strong class='text-base font-medium flex items-center gap-2'>Client Id: <span
+                                        class='text-red-600 bg-yellow-200 px-2 rounded'>" . $key + 1 . "</span></strong>
+                            </h3>
+                            <div class='flex items-center justify-between gap-20'>
+                                <div class='flex-1 flex justify-between gap-16'>
+                                    <h4 class='font-medium'>{$value['company']}</h4>
+                                    <dl class='flex gap-2'>
+                                        <dt class='font-medium'>Type:</dt>
+                                        <dd>{$value['companyType']}</dd>
+                                    </dl>
+                                </div>
+                                <dl class='flex-1 flex gap-2'>
+                                    <dt class='font-medium'>Website:</dt>
+                                    <dd><a href='#' class='text-blue-600'>{$value['website']}</a></dd>
+                                </dl>
+                            </div>
+                        </header>
+                        <dl class='space-y-2'>
+                            <div class='flex items-center gap-4'>
+                                <dt class='font-medium'>Preffered Modes of Contact:</dt>
+                                <dd class='" . (in_array("Phone", $value['contactMethod']) ? "bg-green-300" : "bg-red-400") . " text-blue-700 px-6 rounded-full'>Phone</dd>
+                                <dd class='" . (in_array("Email", $value['contactMethod']) ? "bg-green-300" : "bg-red-400") . " text-blue-700 px-6 rounded-full ml-2'>Email</dd>
+                            </div>
+                            <div class='grid grid-cols-2 gap-20'>
+                                <div class='flex gap-2'>
+                                    <dt class='font-medium'>Phone Number:</dt>
+                                    <dd>
+                                        <address class='not-italic'><a href='tel:+{$value['phone']}'>{$value['phone']}</a></address>
+                                    </dd>
+                                </div>
+                                <div class='flex gap-2'>
+                                    <dt class='font-medium'>Email Address:</dt>
+                                    <dd>
+                                        <address class='not-italic'><a href='mailto:{$value['email']}'>{$value['email']}</a></address>
+                                    </dd>
+                                </div>
+                            </div>
                         </dl>
-                    </header>
-                    <dl class='space-y-1'>
-                        <div class='flex gap-2'>
-                            <dt>Preffered Mode of Contact:</dt>
-                            <dd class='bg-green-300 text-blue-800 px-4 rounded-full'>{$value["contactMethod"]}</dd>
-                        </div>
-                        <div class='flex gap-12'>
-                            <div class='flex gap-2'>
-                                <dt>Phone Number:</dt>
-                                <dd>
-                                    <address class='not-italic'><a href='tel:+{$value["phone"]}'>{$value["phone"]}</a></address>
-                                </dd>
-                            </div>
-                            <div class='flex gap-2'>
-                                <dt>Email Address:</dt>
-                                <dd>
-                                    <address class='not-italic'><a href='mailto:{$value["email"]}'>{$value["email"]}</a></address>
-                                </dd>
-                            </div>
-                        </div>
-                    </dl>
-                    <dl class='space-y-1'>
-                        <dt>Address:</dt>
-                        <dd>{$value["address"]}</dd>
-                    </dl>
-                </div>";
+                        <dl class='flex gap-2'>
+                            <dt class='font-medium'>Address:</dt>
+                            <dd>{$value['address']}</dd>
+                        </dl>
+                    </div>";
                     }
                 }
 
