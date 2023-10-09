@@ -29,7 +29,7 @@
     // echo "<br>";
     // echo convert_uudecode(convert_uuencode($str));
     
-    // print_r(count_chars($str));
+    // print_r(count_chars($str, 3));
     // print_r(count_chars($str, 1));
     // print_r(count_chars($str, 4));
     // $charsUsed = count_chars($str, 1);
@@ -73,11 +73,14 @@
     // echo "<br>";
     // echo strtolower($str);
     // echo "<br>";
-
-    // parse_str("id=1&name=Sajal", $a);
-    // foreach ($a as $key => $value) {
-    //     echo $key, ": ", $value, "<br>";
-    // }
+    print_r($_GET);
+    echo "<br>";
+    echo implode('&', $_GET);
+    echo "<br>";
+    parse_str(implode('&', $_GET), $a);
+    foreach ($a as $key => $value) {
+        echo $key, ": ", $value, "<br>";
+    }
 
     // echo str_ireplace("WORLD","Peter","world Hello world!", $count);
     // echo $count;
@@ -91,7 +94,6 @@
 
     // echo strip_tags("Hello <b><i>world!</i></b>","<b>");
 
-    
 
     ?>
 </body>

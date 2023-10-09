@@ -119,51 +119,51 @@ session_start();
                 }
             }
 
-            if (isset($_REQUEST['submit'])) {
-                // $fnameErr = validateTextData($_REQUEST['fname']);
-                // $lnameErr = validateEmail($_REQUEST['lname']);
-                $fname = $_REQUEST['fname'];
+            if (isset($_POST['submit'])) {
+                // $fnameErr = validateTextData($_POST['fname']);
+                // $lnameErr = validateEmail($_POST['lname']);
+                $fname = $_POST['fname'];
                 if ($fnameErr = validateTextData($fname)) {
                     $fname = '';
                 }
-                $lname = $_REQUEST['lname'];
+                $lname = $_POST['lname'];
                 if ($lnameErr = validateTextData($lname)) {
                     $lname = '';
                 }
-                $company = $_REQUEST['company'];
+                $company = $_POST['company'];
                 if ($companyErr = validateCompanyName($company)) {
                     $company = '';
                 }
-                if (isset($_REQUEST['department'])) {
-                    $department = $_REQUEST['department'];
+                if (isset($_POST['department'])) {
+                    $department = $_POST['department'];
                 } else {
                     $departmentErr = "*Select department";
                 }
-                if (isset($_REQUEST['companyType'])) {
-                    $companyType = $_REQUEST['companyType'];
+                if (isset($_POST['companyType'])) {
+                    $companyType = $_POST['companyType'];
                 } else {
                     $isDataValid = false;
                     $companyTypeErr = "*Select company type";
                 }
-                $website = $_REQUEST['website'];
+                $website = $_POST['website'];
                 if ($websiteErr = validateURL($website)) {
                     $website = '';
                 }
-                if (isset($_REQUEST['contactMethod'])) {
-                    $contactMethod = $_REQUEST['contactMethod'];
+                if (isset($_POST['contactMethod'])) {
+                    $contactMethod = $_POST['contactMethod'];
                 } else {
                     $isDataValid = false;
                     $contactMethodErr = "*Select atleast one mode";
                 }
-                $email = $_REQUEST['emailAddress'];
+                $email = $_POST['emailAddress'];
                 if ($emailErr = validateEmail($email)) {
                     $email = '';
                 }
-                $phone = $_REQUEST['phoneNumber'];
+                $phone = $_POST['phoneNumber'];
                 if ($phoneErr = validatePhoneNumber($phone)) {
                     $phone = '';
                 }
-                $address = $_REQUEST['address'];
+                $address = $_POST['address'];
                 if ($addressErr = validateTextarea($address)) {
                     $address = '';
                 }
@@ -271,7 +271,7 @@ session_start();
             <h2 class="text-2xl font-medium">Client's Details</h2>
             <div class="space-y-1 mt-10 h-[calc(100vh-106px)] overflow-y-auto">
                 <?php
-                if (isset($_REQUEST['submit'])) {
+                if (isset($_POST['submit'])) {
                     $data = array(
                         'fname' => $fname,
                         'lname' => $lname,
