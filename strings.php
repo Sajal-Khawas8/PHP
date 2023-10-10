@@ -92,16 +92,4 @@
 
     // echo strip_tags("Hello <b><i>world!</i></b>","<b>");
 
-    // function stutter($word) {
-    //     $twoChars = substr($word, 0, 2);
-    //     return "$twoChars...$twoChars...$word?";
-    // }
-    // echo  stutter("incredible");
-
-    function isEmpty($str) {
-        return !(strlen($str)===0);
-    }
-
-    var_dump(isEmpty(""));
-
     ?>
