@@ -1,15 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-
-<body>
     <?php
-    $str = "Hello world";
+   // $str = "Hello world";
     // echo addcslashes($str, 'w');
     // echo "<br>";
     // echo addcslashes($str, 'a..z');
@@ -73,15 +63,23 @@
     // echo "<br>";
     // echo strtolower($str);
     // echo "<br>";
-    print_r($_GET);
-    echo "<br>";
-    echo implode('&', $_GET);
-    echo "<br>";
-    parse_str(implode('&', $_GET), $a);
-    foreach ($a as $key => $value) {
-        echo $key, ": ", $value, "<br>";
-    }
+    // parse_str($_SERVER['QUERY_STRING'], $a);
+    // foreach ($a as $key => $value) {
+    //     echo $key, ": ", $value, "<br>";
+    // }
 
+    // echo quoted_printable_encode($str);
+    // echo quoted_printable_decode($str);
+
+    // echo sha1($str);
+
+    // $sim = similar_text('bafoobar', 'barfoo', $perc);
+    // echo "similarity: $sim ($perc %)<br>";
+    // $sim = similar_text('barfoo', 'bafoobar', $perc);
+    // echo "similarity: $sim ($perc %)<br>";
+    // $str='Karan';
+    // $a = 1;
+    // var_dump($a);
     // echo str_ireplace("WORLD","Peter","world Hello world!", $count);
     // echo $count;
     
@@ -94,8 +92,16 @@
 
     // echo strip_tags("Hello <b><i>world!</i></b>","<b>");
 
+    // function stutter($word) {
+    //     $twoChars = substr($word, 0, 2);
+    //     return "$twoChars...$twoChars...$word?";
+    // }
+    // echo  stutter("incredible");
+
+    function isEmpty($str) {
+        return !(strlen($str)===0);
+    }
+
+    var_dump(isEmpty(""));
 
     ?>
-</body>
-
-</html>
