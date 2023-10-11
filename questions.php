@@ -99,10 +99,49 @@
     // }
     // echo arraySum([1, 2, 3, 4, 5, 6]);
 
-    function equaltotal($total, $people, $each)
-    {
-        return $people*$each<=$total;
-    }
-    var_dump(equaltotal(5, 0, 100));
+    // function equaltotal($total, $people, $each)
+    // {
+    //     return $people*$each<=$total;
+    // }
+    // var_dump(equaltotal(5, 0, 100));
 
+
+    // function length($str)
+    // {
+    //     if (!strlen($str)) {
+    //         return 0;
+    //     }
+    //     return 1+length(substr($str,1));
+    // }
+
+    // echo length("");
+
+    // function halfQuarterEighth($n)
+    // {
+    //     return [$n/2, $n/4, $n/8];
+    // }
+    // print_r(halfQuarterEighth(25));
+
+    // function reverse($arr)
+    // {
+    //     $l=count($arr);
+    //     for ($i=0; $i < $l; $i++) {
+    //         if ($i == ceil($l/2)) {
+    //             break;
+    //         }
+    //         $temp=$arr[$i];
+    //         $arr[$i] = $arr[$l-$i-1];
+    //         $arr[$l-$i-1] = $temp;
+    //     }
+    //     return $arr;
+    // }
+    // print_r(reverse([1,2,3,4,5,6]));
+
+    function safeBridge($bridge)
+    {
+        str_replace(" ", " ", $bridge, $count);
+        return $count===0;
+    }
+
+    var_dump(safeBridge('## ## #'));
 ?>
