@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,6 +13,20 @@
 </head>
 
 <body class="flex gap-0 h-screen font-openSans">
+        <div class="items-center justify-center h-screen bg-gray-200/70 absolute inset-0 z-20 <?= isset($_SESSION['loginName']) ? "hidden" : "flex" ?>">
+            <article class="w-1/4 bg-white p-4 space-y-5">
+                <div class="flex justify-between items-center">
+                    <h2 class="font-medium text-lg text-red-500">Access Denied!!</h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
+                        class="h-7 w-7 text-yellow-400">
+                        <path fill-rule="evenodd"
+                            d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <p class="text-2xl font-medium">You are not logged in. Please <a href="./login.php" class="text-indigo-600">login to continue</a>.</p>
+            </article>
+        </div>
     <aside class="w-64 h-full p-3 hidden lg:block">
         <header class="mx-auto my-3 w-fit">
             <svg width="130" height="30" xmlns="http://www.w3.org/2000/svg">
@@ -228,13 +243,19 @@
                 </g>
             </svg>
             <span>Log Out</span>
-            <a href="#" class="absolute inset-0"></a>
+            <a href="../server/logOut.php" class="absolute inset-0"></a>
         </footer>
     </aside>
-
-    <main class="flex-1 bg-gray-100 overflow-x-hidden overflow-y-auto">
+    <main class="flex-1 bg-gray-100 overflow-x-hidden overflow-y-auto <?= isset($_SESSION['loginName']) ? "block" : "hidden" ?>">
         <header class="flex justify-between items-center text-sm py-2.5 px-6">
-            <h3 class="text-lg font-medium">Welcome, Admin Jordan</h3>
+            <?php foreach($_SESSION['users'] as $userDetails)
+            {
+                if (($_SESSION['loginName'] === $userDetails['uname'] || $_SESSION['loginName'] === $userDetails['email'] || $_SESSION['loginName'] === $userDetails['phone'])) {
+                    echo '<h3 class="text-lg font-medium">Welcome, ' . $userDetails['fname'] . '</h3>';
+                    break;
+                }
+            }
+            ?>
             <svg class="w-8 h-8" height="36" width="36" xmlns="http://www.w3.org/2000/svg" role="img"
                 viewBox="0 0 24 24" aria-labelledby="userIconTitle" fill="none" stroke="currentColor">
                 <title id="userIconTitle">User</title>
@@ -262,51 +283,55 @@
             </header>
 
             <ul class="px-6 space-y-4">
-                <li class="flex gap-5 shadow-md bg-white py-2.5 px-6 rounded">
-                    <div class="bg-red-800 w-4 h-4 rounded-full mt-1.5"></div>
-                    <div>
-                        <h3 class="text-xl font-semibold">Full Name</h3>
-                        <p class="text-lg font-medium">Username</p>
-                        <dl class="flex gap-4">
-                            <div class="flex items-center gap-2">
-                                <dt class="font-medium">Email Address:</dt>
-                                <dd><a href="mailto:">email@gmail.com</a></dd>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <dt class="font-medium">Phone Number:</dt>
-                                <dd><a href="tel:+">123456789</a></dd>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <dt class="font-medium">Password:</dt>
-                                <dd>password@123</dd>
-                            </div>
-                        </dl>
-                    </div>
-                    <div class="flex items-center flex-wrap gap-12 ml-auto text-sm text-center">
-                        <button type="button">
-                            <svg class="w-6 h-6 cursor-pointer" height="24" width="24"
-                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path
-                                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
-                                </path>
-                                <title>Edit</title>
-                            </svg>
-                        </button>
-                        <button type="button">
-                            <svg class="w-7 h-7 text-red-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                fill="currentColor">
-                                <path d="M0 0h24v24H0V0z" fill="none"></path>
-                                <path
-                                    d="M6 21h12V7H6v14zm2.46-9.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4h-3.5z">
-                                </path>
-                                <title>Delete</title>
-                            </svg>
-                        </button>
-                    </div>
-                </li>
+                <?php foreach($_SESSION['users'] as $userDetails) : ?>
+                    <?php $isCurrentUser = ($_SESSION['loginName'] === $userDetails['uname'] || $_SESSION['loginName'] === $userDetails['email'] || $_SESSION['loginName'] === $userDetails['phone']) ?>
+                    <li class="flex gap-5 shadow-md bg-white py-2.5 px-6 rounded">
+                        <div class="bg-red-800 w-4 h-4 rounded-full mt-1.5"></div>
+                        <div>
+                            <h3 class="text-xl font-semibold"><?= $userDetails['fname']; ?></h3>
+                            <p class="text-lg font-medium"><?= $userDetails['uname']; ?></p>
+                            <dl class="flex gap-4">
+                                <div class="flex items-center gap-2">
+                                    <dt class="font-medium">Email Address:</dt>
+                                    <dd><a href="mailto:<?= $isCurrentUser ? $userDetails['email'] : ""; ?>"><?= $isCurrentUser ? $userDetails['email'] : substr($userDetails['email'], 0, 2).str_repeat("x", strlen($userDetails['email'])-5).substr($userDetails['email'], -3); ?></a></dd>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <dt class="font-medium">Phone Number:</dt>
+                                    <dd><a href="tel:+<?= $isCurrentUser ? $userDetails['phone'] : ""; ?>"><?= $isCurrentUser ? $userDetails['phone'] : substr($userDetails['phone'], 0, 2).str_repeat("x", 4).substr($userDetails['phone'], -4); ?></a></dd>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <dt class="font-medium">Password:</dt>
+                                    <dd><?= $isCurrentUser ? $userDetails['password'] : str_repeat("*", strlen($userDetails['password'])); ?></dd>
+                                </div>
+                            </dl>
+                        </div>
+                        <div class="items-center flex-wrap gap-12 ml-auto text-sm text-center <?= $isCurrentUser ? "flex" : "hidden" ?>">
+                            <button type="button" class="">
+                                <svg class="w-6 h-6 cursor-pointer" height="24" width="24"
+                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
+                                    </path>
+                                    <title>Edit</title>
+                                </svg>
+                            </button>
+                            <button type="button">
+                                <svg class="w-7 h-7 text-red-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path d="M0 0h24v24H0V0z" fill="none"></path>
+                                    <path
+                                        d="M6 21h12V7H6v14zm2.46-9.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4h-3.5z">
+                                    </path>
+                                    <title>Delete</title>
+                                </svg>
+                            </button>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
             </ul>
         </section>
     </main>
 </body>
 
 </html>
+<?php unset($_SESSION['loginName']); ?>
