@@ -9,6 +9,7 @@ function cleanData(&$data)
 function validateTextData(&$data, &$isDataValid)
 {
     cleanData($data);
+    $data = ucwords($data);
     if (empty($data)) {
         $isDataValid = false;
         return "*Please enter your Name";
@@ -110,7 +111,7 @@ function validateCnfrmPassword(&$cnfrmPassword, $password, &$isDataValid)
     }
 }
 
-function validateLoginName(&$loginName)
+function validateLoginName(&$loginName, &$email)
 {
     cleanData($loginName);
     $loginName = strtolower($loginName);
@@ -119,7 +120,7 @@ function validateLoginName(&$loginName)
     }
     if (filter_var($loginName, FILTER_VALIDATE_EMAIL)) {
         $input='email';
-    } elseif (preg_match("/[0-9]{10}/", $loginName)) {
+    } elseif (preg_match("/^[0-9]*$/", $loginName)) {
         $input='phone';
     } else {
         $input='username';
@@ -127,22 +128,25 @@ function validateLoginName(&$loginName)
 
     switch ($input) {
         case 'email':
-            foreach ($_SESSION['users'] as $userDetails) {
+            foreach ($_SESSION['users'] as $userID => $userDetails) {
                 if ($userDetails['email'] === $loginName) {
+                    $email = $userID;
                     return;
                 }
             }
             return "*Invalid Email Address";
         case 'phone':
-            foreach ($_SESSION['users'] as $userDetails) {
+            foreach ($_SESSION['users'] as $userID => $userDetails) {
                 if ($userDetails['phone'] === $loginName) {
+                    $email = $userID;
                     return;
                 }
             }
             return "*Invalid Phone Number";
         case 'username':
-            foreach ($_SESSION['users'] as $userDetails) {
+            foreach ($_SESSION['users'] as $userID => $userDetails) {
                 if ($userDetails['uname'] === $loginName) {
+                    $email = $userID;
                     return;
                 }
             }
@@ -151,18 +155,14 @@ function validateLoginName(&$loginName)
     
 }
 
-function validateLoginPassword($loginPassword)
+function validateLoginPassword($loginPassword, $id)
 {
     cleanData($loginPassword);
     if (empty($loginPassword)) {
         return "*Please enter your Password";
+    } elseif ($_SESSION['users'][$id]['password'] !== $loginPassword) {
+        return "*Invalid Password";
     }
-    foreach ($_SESSION['users'] as $userDetails) {
-        if ($userDetails['password'] === $loginPassword) {
-            return;
-        }
-    }
-    return "*Invalid Password";
 }
 
 ?>
