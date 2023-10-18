@@ -14,7 +14,7 @@
     <div class="bg-gray-200/70 flex items-center justify-center h-screen">
         <article class="w-1/3 bg-white p-4 space-y-5">
             <h1 class="text-4xl font-semibold text-center">Registration</h1>
-            <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" class="space-y-10 py-5">
+            <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" class="space-y-7 py-5">
                 <div class="grid grid-cols-2 gap-6">
                     <div class="relative">
                         <input type="text" name="fname" id="fname" placeholder="Full Name"
