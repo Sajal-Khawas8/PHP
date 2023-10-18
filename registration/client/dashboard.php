@@ -1,4 +1,9 @@
-<?php session_start(); ?>
+<?php 
+require("../server/handleFormSubmissions.php");
+if (!isset($_SESSION['loginName'])) {
+    header("Location: ./login.php");
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,20 +18,6 @@
 </head>
 
 <body class="flex gap-0 h-screen font-openSans">
-        <div class="items-center justify-center h-screen bg-gray-200/70 absolute inset-0 z-20 <?= isset($_SESSION['loginName']) ? "hidden" : "flex" ?>">
-            <article class="w-1/4 bg-white p-4 space-y-5">
-                <div class="flex justify-between items-center">
-                    <h2 class="font-medium text-lg text-red-500">Access Denied!!</h2>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
-                        class="h-7 w-7 text-yellow-400">
-                        <path fill-rule="evenodd"
-                            d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                </div>
-                <p class="text-2xl font-medium">You are not logged in. Please <a href="./login.php" class="text-indigo-600">login to continue</a>.</p>
-            </article>
-        </div>
     <aside class="w-64 h-full p-3 hidden lg:block">
         <header class="mx-auto my-3 w-fit">
             <svg width="130" height="30" xmlns="http://www.w3.org/2000/svg">
@@ -229,21 +220,24 @@
                 </li>
             </ul>
         </nav>
-        <footer class="mt-6 flex items-center font-semibold leading-9 bg-sky-500 rounded-md relative">
-            <svg class="w-5 h-5 mx-2.5 my-0" height="24" width="24" xmlns="http://www.w3.org/2000/svg"
-                enable-background="new 0 0 24 24" viewBox="0 0 24 24" fill="currentColor">
-                <g>
-                    <path d="M0,0h24v24H0V0z" fill="none"></path>
-                </g>
-                <g>
-                    <g>
-                        <polygon points="5,5 12,5 12,3 3,3 3,21 12,21 12,19 5,19"></polygon>
-                        <polygon points="21,12 17,8 17,11 9,11 9,13 17,13 17,16"></polygon>
-                    </g>
-                </g>
-            </svg>
-            <span>Log Out</span>
-            <a href="../server/logOut.php" class="absolute inset-0"></a>
+        <footer class="mt-6 font-semibold leading-9 bg-sky-500 rounded-md">
+            <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+                <button name="logout" id="logout" class="flex items-center w-full">
+                    <svg class="w-5 h-5 mx-2.5 my-0" height="24" width="24" xmlns="http://www.w3.org/2000/svg"
+                        enable-background="new 0 0 24 24" viewBox="0 0 24 24" fill="currentColor">
+                        <g>
+                            <path d="M0,0h24v24H0V0z" fill="none"></path>
+                        </g>
+                        <g>
+                            <g>
+                                <polygon points="5,5 12,5 12,3 3,3 3,21 12,21 12,19 5,19"></polygon>
+                                <polygon points="21,12 17,8 17,11 9,11 9,13 17,13 17,16"></polygon>
+                            </g>
+                        </g>
+                    </svg>
+                    <span>Log Out</span>
+                </button>
+            </form>
         </footer>
     </aside>
     <main class="flex-1 bg-gray-100 overflow-x-hidden overflow-y-auto <?= isset($_SESSION['loginName']) ? "block" : "hidden" ?>">
@@ -334,4 +328,3 @@
 </body>
 
 </html>
-<?php unset($_SESSION['loginName']); ?>

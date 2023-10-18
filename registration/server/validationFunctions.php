@@ -6,22 +6,96 @@ function cleanData(&$data)
     $data = htmlspecialchars($data);
 }
 
+function isEmpty($data, &$msg, $field)
+{
+    if (empty($data)) {
+        $msg = "*Please enter your $field";
+        return TRUE;
+    }
+}
+
+function isInvalidMinLength($data, &$msg, $field)
+{
+    if (strlen($data) < 3) {
+        $msg = "*{$field} must contain more than 3 characters";
+        return TRUE;
+    }
+}
+
+function isInvalidMaxLength($data, &$msg, $field)
+{
+    if (strlen($data) > 15) {
+        $msg = "*{$field} must contain less than 15 characters";
+        return TRUE;
+    }
+}
+
+function isInvalidFormat($data, &$msg, $field)
+{
+    $field=strtok($field, " ");
+    switch ($field) {
+        case 'Name':
+        case 'name':
+            if (!preg_match("/^[a-zA-Z ]*$/", $data)) {
+                $msg = "*Name must contain only letters and white spaces";
+                return TRUE;
+            }
+            break;
+        case 'Username':
+        case 'username':
+            if (!preg_match("/[a-zA-Z]+[0-9]+/", $data)) {
+                $msg = "*Invalid Username. Username must be in the form of 'abc123'";
+                return TRUE;
+            }
+            break;
+        case 'Email':
+        case 'email':
+            if (!filter_var($data, FILTER_VALIDATE_EMAIL)) {
+                $msg = "*Invalid Email Address";
+                return TRUE;
+            }
+            break;
+        case 'Phone':
+        case 'phone':
+            if (!preg_match("/[0-9]{10}/", $data)) {
+                $msg = "*Invalid Phone Number";
+                return TRUE;
+            }
+            break;
+        case 'Password':
+        case 'password':
+            if (!preg_match("/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()-_+])/", $data)) {
+                $msg = "*Your password must contain: <ul class='list-disc'> <li>Uppercase letters (A-Z)</li><li>Lowercase letters (a-z)</li><li>Numbers (0-9)</li><li>Special Characters (!@#$%^&*()-_+)</li><li>Minimum 8 and Maximum 16 characters</li></ul>";
+                return TRUE;
+            }
+            break;
+    }
+    
+}
+
+function isRedundantData($data, &$msg, $field, $dataType)
+{
+    // if (in_array($data, array_column($_SESSION['users'], $dataType))) {
+    //     $msg = "*This $field has already been taken";
+    //     return TRUE;
+    // }
+    foreach ($_SESSION['users'] as $userDetails) {
+        if ($userDetails[$dataType] === $data) {
+            $msg = "*This $field has already been taken";
+            return TRUE;
+        }
+    }
+}
+
+
 function validateTextData(&$data, &$isDataValid)
 {
     cleanData($data);
     $data = ucwords($data);
-    if (empty($data)) {
+    $errMsg = NULL;
+    if (isEmpty($data, $errMsg, 'Name') || isInvalidMinLength($data, $errMsg, 'Name') || isInvalidMaxLength($data, $errMsg, 'Name') || isInvalidFormat($data, $errMsg, 'Name')) {
         $isDataValid = false;
-        return "*Please enter your Name";
-    } elseif (strlen($data) < 3) {
-        $isDataValid = false;
-        return "*Name must contain more than 3 characters";
-    } elseif (strlen($data) > 20) {
-        $isDataValid = false;
-        return "*Name must contain less than 20 characters";
-    } elseif (!preg_match("/^[a-zA-Z ]*$/", $data)) {
-        $isDataValid = false;
-        return "*Name must contain only letters and white spaces";
+        return $errMsg;
     }
 }
 
@@ -29,21 +103,10 @@ function validateUsername(&$data, &$isDataValid)
 {
     cleanData($data);
     $data = strtolower($data);
-    if (empty($data)) {
+    $errMsg = NULL;
+    if (isEmpty($data, $errMsg, 'Username') || isInvalidMinLength($data, $errMsg, 'Username') || isInvalidMaxLength($data, $errMsg, 'Username') || isInvalidFormat($data, $errMsg, 'Username') || isRedundantData($data, $errMsg, 'Username', 'uname')) {
         $isDataValid = false;
-        return "*Please enter your Username";
-    } elseif (strlen($data) < 3) {
-        $isDataValid = false;
-        return "*Username must contain more than 3 characters";
-    } elseif (strlen($data) > 10) {
-        $isDataValid = false;
-        return "*Username must contain less than 10 characters";
-    } elseif (!preg_match("/[a-zA-Z]+[0-9]+/", $data)) {
-        $isDataValid = false;
-        return "*Invalid Username. Username must be in the form of 'abc123'";
-    } elseif (in_array($data, array_column($_SESSION['users'], 'uname'))) {
-        $isDataValid = false;
-        return "*This Username has already been taken";
+        return $errMsg;
     }
 }
 
@@ -51,57 +114,41 @@ function validateEmail(&$data, &$isDataValid)
 {
     cleanData($data);
     $data = strtolower($data);
-    if (empty($data)) {
+    $errMsg = NULL;
+    if (isEmpty($data, $errMsg, 'Email Address') || isInvalidFormat($data, $errMsg, 'Email Address') || isRedundantData($data, $errMsg, 'Email Address', 'email')) {
         $isDataValid = false;
-        return "*Please enter your Email Address";
-    } elseif (!filter_var($data, FILTER_VALIDATE_EMAIL)) {
-        $isDataValid = false;
-        return "*Invalid Email Address";
-    }
-    foreach ($_SESSION['users'] as $userDetails) {
-        if ($userDetails['email'] === $data) {
-            $isDataValid = false;
-            return "*This Email has already been taken";
-        }
+        return $errMsg;
     }
 }
 
 function validatePhoneNumber(&$data, &$isDataValid)
 {
     cleanData($data);
-    if (empty($data)) {
+    $errMsg = NULL;
+    if (isEmpty($data, $errMsg, 'Phone Number') || isInvalidFormat($data, $errMsg, 'Phone Number') || isRedundantData($data, $errMsg, 'Phone Number', 'phone')) {
         $isDataValid = false;
-        return "*Please enter your Phone Number";
-    } elseif (!preg_match("/[0-9]{10}/", $data)) {
-        $isDataValid = false;
-        return "*Invalid Phone Number";
-    } elseif (in_array($data, array_column($_SESSION['users'], 'phone'))) {
-        $isDataValid = false;
-        return "*This Phone Number has already been taken";
+        return $errMsg;
     }
 }
 
-function validatePassword(&$data, &$isDataValid)
+function validatePasswordFormat(&$data, &$isDataValid)
 {
     cleanData($data);
-    if (empty($data)) {
+    $errMsg = NULL;
+    if (isEmpty($data, $errMsg, 'Password') || isInvalidFormat($data, $errMsg, 'Password')) {
         $isDataValid = false;
-        return "*Please enter Password";
-    } elseif (strlen($data) < 6) {
-        $isDataValid = false;
-        return "*Password must contain more than 6 characters";
-    } elseif (strlen($data) > 16) {
-        $isDataValid = false;
-        return "*Password must contain less than 16 characters";
-    } elseif (!preg_match("/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()-_+])/", $data)) {
-        $isDataValid = false;
-        return "*Invalid Password. Password must contain one uppercase letter, one lowercase letter, one digit and one special character";
+        return $errMsg;
     }
 }
 
-function validateCnfrmPassword(&$cnfrmPassword, $password, &$isDataValid)
+function validateCnfrmPassword($cnfrmPassword, $password, &$isDataValid)
 {
     cleanData($cnfrmPassword);
+    // $errMsg = NULL;
+    // if (isEmpty($cnfrmPassword, $errMsg, 'Password') || !validatePassword($password, $cnfrmPassword)) {
+    //     $isDataValid = false;
+    //     return $errMsg;
+    // }
     if (empty($cnfrmPassword)) {
         $isDataValid = false;
         return "*Please Retype your Password";
@@ -111,58 +158,72 @@ function validateCnfrmPassword(&$cnfrmPassword, $password, &$isDataValid)
     }
 }
 
-function validateLoginName(&$loginName, &$email)
+function searchUser($dataType, $loginName)
+{
+    foreach ($_SESSION['users'] as $userID => $userDetails) {
+        if ($userDetails[$dataType] === $loginName) {
+            return $userID;
+        }
+    }
+}
+
+function validatePassword($accountPassword, $loginPassword)
+{
+    return ($accountPassword === $loginPassword);
+}
+
+function validateLoginData(&$loginName, $loginPassword, &$loginNameErr, &$loginPasswordErr)
 {
     cleanData($loginName);
     $loginName = strtolower($loginName);
-    if (empty($loginName)) {
-        return "*Please enter your Username";
+    $errMsg = NULL;
+    if (isEmpty($loginName, $errMsg, 'Username / Email Address or Phone Number')) {
+        $loginNameErr = $errMsg;
+        return FALSE;
     }
-    if (filter_var($loginName, FILTER_VALIDATE_EMAIL)) {
-        $input='email';
-    } elseif (preg_match("/^[0-9]*$/", $loginName)) {
-        $input='phone';
+    if (preg_match("/^[0-9]*$/", $loginName)) {
+        $input = 'phone';
+    } elseif (filter_var($loginName, FILTER_VALIDATE_EMAIL)) {
+        $input = 'email';
     } else {
-        $input='username';
+        $input = 'username';
     }
 
     switch ($input) {
         case 'email':
-            foreach ($_SESSION['users'] as $userID => $userDetails) {
-                if ($userDetails['email'] === $loginName) {
-                    $email = $userID;
-                    return;
-                }
+            $email = searchUser('email', $loginName);
+            if ($email===NULL) {
+                $loginNameErr = "*Invalid Email Address";
+                return FALSE;
             }
-            return "*Invalid Email Address";
+            break;
         case 'phone':
-            foreach ($_SESSION['users'] as $userID => $userDetails) {
-                if ($userDetails['phone'] === $loginName) {
-                    $email = $userID;
-                    return;
-                }
+            $email = searchUser('phone', $loginName);
+            if ($email===NULL) {
+                $loginNameErr = "*Invalid Phone Number";
+                return FALSE;
             }
-            return "*Invalid Phone Number";
+            break;
         case 'username':
-            foreach ($_SESSION['users'] as $userID => $userDetails) {
-                if ($userDetails['uname'] === $loginName) {
-                    $email = $userID;
-                    return;
-                }
+            $email = searchUser('uname', $loginName);
+            if ($email===NULL) {
+                $loginNameErr = "*Invalid Username";
+                return FALSE;
             }
-            return "*Invalid Username";
+            break;
     }
-    
-}
 
-function validateLoginPassword($loginPassword, $id)
-{
     cleanData($loginPassword);
-    if (empty($loginPassword)) {
-        return "*Please enter your Password";
-    } elseif ($_SESSION['users'][$id]['password'] !== $loginPassword) {
-        return "*Invalid Password";
+    if (isEmpty($loginPassword, $errMsg, 'Password')) {
+        $loginPasswordErr = $errMsg;
+        return FALSE;
     }
+    if(!validatePassword($_SESSION['users'][$email]['password'], $loginPassword))
+    {
+        $loginPasswordErr = "*Invalid Password";
+        return FALSE;
+    }
+    return TRUE;
 }
 
 ?>
