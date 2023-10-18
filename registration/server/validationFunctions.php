@@ -158,12 +158,27 @@ function validateCnfrmPassword($cnfrmPassword, $password, &$isDataValid)
     }
 }
 
-function searchUser($dataType, $loginName)
+function searchUser($searchID)
 {
+    if (preg_match("/^[0-9]*$/", $searchID)) {
+        $dataType = 'phone';
+    } elseif (filter_var($searchID, FILTER_VALIDATE_EMAIL)) {
+        $dataType = 'email';
+    } else {
+        $dataType = 'uname';
+    }
     foreach ($_SESSION['users'] as $userID => $userDetails) {
-        if ($userDetails[$dataType] === $loginName) {
+        if ($userDetails[$dataType] === $searchID) {
             return $userID;
         }
+    }
+    switch ($dataType) {
+        case 'email':
+            return "*Invalid Email Address";
+        case 'phone':
+            return "*Invalid Phone Number";
+        case 'uname':
+            return "*Invalid Username";
     }
 }
 
@@ -181,36 +196,11 @@ function validateLoginData(&$loginName, $loginPassword, &$loginNameErr, &$loginP
         $loginNameErr = $errMsg;
         return FALSE;
     }
-    if (preg_match("/^[0-9]*$/", $loginName)) {
-        $input = 'phone';
-    } elseif (filter_var($loginName, FILTER_VALIDATE_EMAIL)) {
-        $input = 'email';
-    } else {
-        $input = 'username';
-    }
 
-    switch ($input) {
-        case 'email':
-            $email = searchUser('email', $loginName);
-            if ($email===NULL) {
-                $loginNameErr = "*Invalid Email Address";
-                return FALSE;
-            }
-            break;
-        case 'phone':
-            $email = searchUser('phone', $loginName);
-            if ($email===NULL) {
-                $loginNameErr = "*Invalid Phone Number";
-                return FALSE;
-            }
-            break;
-        case 'username':
-            $email = searchUser('uname', $loginName);
-            if ($email===NULL) {
-                $loginNameErr = "*Invalid Username";
-                return FALSE;
-            }
-            break;
+    $email = searchUser($loginName);
+    if (stristr($email, "Invalid")) {
+        $loginNameErr = $email;
+        return FALSE;
     }
 
     cleanData($loginPassword);

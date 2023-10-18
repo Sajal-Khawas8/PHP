@@ -5,7 +5,7 @@ $isDataValid = true;
 $loginNameErr = $loginPasswordErr = '';
 require "../server/validationFunctions.php";
 
-
+// Handle Registration Form
 if (isset($_POST['register'])) {
     $registrationErr = [
         'fnameErr' => validateTextData($_POST['fname'], $isDataValid),
@@ -25,6 +25,7 @@ if (isset($_POST['register'])) {
     
 }
 
+// Handle Login Form
 if (isset($_POST['login'])) {
     if (validateLoginData($_POST['loginName'], $_POST['loginPassword'], $loginNameErr, $loginPasswordErr)) {
         $_SESSION['loginName'] = $_POST['loginName'];
@@ -32,8 +33,16 @@ if (isset($_POST['login'])) {
     }
 }
 
+// Handle Logout button
 if (isset($_POST['logout'])) {
     unset($_SESSION['loginName']);
     header("Location: ../client/login.php");
+}
+
+//Handle Delete Button
+if (isset($_POST['deleteUser'])) {
+    unset($_SESSION['users'][searchUser($_SESSION['loginName'])]);
+    unset($_SESSION['loginName']);
+    header("Location: ../client/index.php");
 }
 ?>
