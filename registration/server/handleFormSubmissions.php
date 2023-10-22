@@ -21,6 +21,7 @@ if (isset($_POST['register'])) {
         $_SESSION['users'][$_POST['email']] = $_POST;
         // array_push($_SESSION['users'], $_POST);
         header('Location: ../client/login.php');
+        exit;
     }
     
 }
@@ -30,6 +31,7 @@ if (isset($_POST['login'])) {
     if (validateLoginData($_POST['loginName'], $_POST['loginPassword'], $loginNameErr, $loginPasswordErr)) {
         $_SESSION['loginName'] = $_POST['loginName'];
         header("Location: ../client/dashboard.php");
+        exit;
     }
 }
 
@@ -37,6 +39,7 @@ if (isset($_POST['login'])) {
 if (isset($_POST['logout'])) {
     unset($_SESSION['loginName']);
     header("Location: ../client/login.php");
+    exit;
 }
 
 //Handle Delete Button
@@ -44,5 +47,6 @@ if (isset($_POST['deleteUser'])) {
     unset($_SESSION['users'][searchUser($_SESSION['loginName'])]);
     unset($_SESSION['loginName']);
     header("Location: ../client/index.php");
+    exit;
 }
 ?>
