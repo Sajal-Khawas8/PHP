@@ -32,7 +32,7 @@ function isInvalidMaxLength($data, &$msg, $field)
 
 function isInvalidFormat($data, &$msg, $field)
 {
-    $field=strtok($field, " ");
+    $field = strtok($field, " ");
     switch ($field) {
         case 'Name':
         case 'name':
@@ -70,21 +70,27 @@ function isInvalidFormat($data, &$msg, $field)
             }
             break;
     }
-    
+
 }
 
 function isRedundantData($data, &$msg, $field, $dataType)
 {
-    // if (in_array($data, array_column($_SESSION['users'], $dataType))) {
-    //     $msg = "*This $field has already been taken";
-    //     return TRUE;
-    // }
-    foreach ($_SESSION['users'] as $userDetails) {
-        if ($userDetails[$dataType] === $data) {
-            $msg = "*This $field has already been taken";
-            return TRUE;
-        }
+    global $conn;
+    $sql = "SELECT * FROM `users` WHERE $dataType = '{$data}'";
+    $result=$conn->query($sql);
+    if (!$result) {
+        die("Error searching user: " . $conn->error);
     }
+    if ($result->num_rows > 0) {
+        $msg = "*This $field has already been taken";
+        return TRUE;
+    }
+    // foreach ($_SESSION['users'] as $userDetails) {
+    //     if ($userDetails[$dataType] === $data) {
+    //         $msg = "*This $field has already been taken";
+    //         return TRUE;
+    //     }
+    // }
 }
 
 
@@ -104,7 +110,7 @@ function validateUsername(&$data, &$isDataValid)
     cleanData($data);
     $data = strtolower($data);
     $errMsg = NULL;
-    if (isEmpty($data, $errMsg, 'Username') || isInvalidMinLength($data, $errMsg, 'Username') || isInvalidMaxLength($data, $errMsg, 'Username') || isInvalidFormat($data, $errMsg, 'Username') || isRedundantData($data, $errMsg, 'Username', 'uname')) {
+    if (isEmpty($data, $errMsg, 'Username') || isInvalidMinLength($data, $errMsg, 'Username') || isInvalidMaxLength($data, $errMsg, 'Username') || isInvalidFormat($data, $errMsg, 'Username') || isRedundantData($data, $errMsg, 'Username', 'username')) {
         $isDataValid = false;
         return $errMsg;
     }
@@ -168,24 +174,33 @@ function validateCnfrmPassword($cnfrmPassword, $password, &$isDataValid)
 
 function searchUser($searchID)
 {
+    global $conn;
     if (preg_match("/^[0-9]*$/", $searchID)) {
         $dataType = 'phone';
     } elseif (filter_var($searchID, FILTER_VALIDATE_EMAIL)) {
         $dataType = 'email';
     } else {
-        $dataType = 'uname';
+        $dataType = 'username';
     }
-    foreach ($_SESSION['users'] as $userID => $userDetails) {
-        if ($userDetails[$dataType] === $searchID) {
-            return $userID;
-        }
+    $sql="SELECT `email` FROM `users` WHERE $dataType = '{$searchID}'";
+    $result=$conn->query($sql);
+    if (!$result) {
+        die("Error searching data: " . $conn->error);
     }
+    if ($result->num_rows>0) {
+        return $result->fetch_column();
+    }
+    // foreach ($_SESSION['users'] as $userID => $userDetails) {
+    //     if ($userDetails[$dataType] === $searchID) {
+    //         return $userID;
+    //     }
+    // }
     switch ($dataType) {
         case 'email':
             return "*Invalid Email Address";
         case 'phone':
             return "*Invalid Phone Number";
-        case 'uname':
+        case 'username':
             return "*Invalid Username";
     }
 }
@@ -200,6 +215,7 @@ function validateLoginData(&$loginName, $loginPassword, &$loginNameErr, &$loginP
     cleanData($loginName);
     $loginName = strtolower($loginName);
     $errMsg = NULL;
+    global $conn;
     if (isEmpty($loginName, $errMsg, 'Username / Email Address or Phone Number')) {
         $loginNameErr = $errMsg;
         return FALSE;
@@ -216,8 +232,12 @@ function validateLoginData(&$loginName, $loginPassword, &$loginNameErr, &$loginP
         $loginPasswordErr = $errMsg;
         return FALSE;
     }
-    if(!validatePassword($_SESSION['users'][$email]['password'], $loginPassword))
-    {
+    $sql="SELECT `password` FROM `users` WHERE email='{$email}'";
+    $result=$conn->query($sql);
+    if (!$result) {
+        die("Search Failed: ". $conn->error);
+    }
+    if (!validatePassword($result->fetch_column(), $loginPassword)) {
         $loginPasswordErr = "*Invalid Password";
         return FALSE;
     }

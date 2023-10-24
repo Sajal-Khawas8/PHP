@@ -3,8 +3,8 @@ session_start();
 $_SESSION['users'] ?? $_SESSION['users'] = [];
 $isDataValid = true;
 $loginNameErr = $loginPasswordErr = '';
-require "../server/validationFunctions.php";
 require "../server/dbConnection.php";
+require "../server/validationFunctions.php";
 
 // Handle Registration Form
 if (isset($_POST['register'])) {
@@ -20,15 +20,14 @@ if (isset($_POST['register'])) {
 
     if ($isDataValid) {
         unset($_POST['confirmPassword'], $_POST['register']);
-        $sql = "INSERT INTO `users` (`name`, `username`, `gender`, `email`, `phone`, `password`) VALUES ('" . $_POST['fname'] . "', '" . $_POST['uname'] . "', '" . $_POST['gender'] . "', '" . $_POST['email'] . "', '" . $_POST['phone'] . "', '" . $_POST['password'] . "')";
         $sql = "INSERT INTO `users` (`name`, `username`, `gender`, `email`, `phone`, `password`) VALUES ('{$_POST['fname']}', '{$_POST['uname']}', '{$_POST['gender']}', '{$_POST['email']}', '{$_POST['phone']}', '{$_POST['password']}')";
-        if (!$conn->query($sql)) {
+        if ($conn->query($sql)===false) {
             die("Error creating user: " . $conn->error);
         }
         header('Location: ../client/login.php');
         exit;
     }
-    
+
 }
 
 // Handle Login Form
