@@ -46,9 +46,22 @@ if (isset($_POST['logout'])) {
     exit;
 }
 
+//Handle Lock Button
+if (isset($_POST['lockUser'])) {
+    $sql="UPDATE `users` SET active = false WHERE email='{$_SESSION['loginName']}' OR username='{$_SESSION['loginName']}' OR phone='{$_SESSION['loginName']}'";
+    $conn->query($sql);
+}
+
+//Handle Unlock Button
+if (isset($_POST['unlockUser'])) {
+    $sql="UPDATE `users` SET active = true WHERE email='{$_SESSION['loginName']}' OR username='{$_SESSION['loginName']}' OR phone='{$_SESSION['loginName']}'";
+    $conn->query($sql);
+}
+
 //Handle Delete Button
 if (isset($_POST['deleteUser'])) {
-    unset($_SESSION['users'][searchUser($_SESSION['loginName'])]);
+    $sql="DELETE FROM `users` WHERE email='{$_SESSION['loginName']}' OR username='{$_SESSION['loginName']}' OR phone='{$_SESSION['loginName']}'";
+    $conn->query($sql);
     unset($_SESSION['loginName']);
     header("Location: ../client/index.php");
     exit;

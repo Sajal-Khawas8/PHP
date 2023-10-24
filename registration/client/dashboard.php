@@ -1,4 +1,4 @@
-<?php 
+<?php
 require("../server/handleFormSubmissions.php");
 if (!isset($_SESSION['loginName'])) {
     header("Location: ./login.php");
@@ -241,15 +241,16 @@ if (!isset($_SESSION['loginName'])) {
             </form>
         </footer>
     </aside>
-    <main class="flex-1 bg-gray-100 overflow-x-hidden overflow-y-auto <?= isset($_SESSION['loginName']) ? "block" : "hidden" ?>">
+    <main class="flex-1 bg-gray-100 overflow-x-hidden overflow-y-auto">
         <header class="flex justify-between items-center text-sm py-2.5 px-6">
-            <?php foreach($_SESSION['users'] as $userDetails)
-            {
-                if (($_SESSION['loginName'] === $userDetails['uname'] || $_SESSION['loginName'] === $userDetails['email'] || $_SESSION['loginName'] === $userDetails['phone'])) {
-                    echo '<h3 class="text-lg font-medium">Welcome, ' . $userDetails['fname'] . '</h3>';
-                    break;
-                }
+            <?php
+            $sql = "SELECT name FROM `users` WHERE email='{$_SESSION['loginName']}' OR username='{$_SESSION['loginName']}' OR phone='{$_SESSION['loginName']}'";
+            $result = $conn->query($sql);
+            if (!$result) {
+                die("Error: " . $conn->error);
             }
+            $name = $result->fetch_column();
+            echo '<h3 class="text-lg font-medium">Welcome, ' . $name . '</h3>';
             ?>
             <svg class="w-8 h-8" height="36" width="36" xmlns="http://www.w3.org/2000/svg" role="img"
                 viewBox="0 0 24 24" aria-labelledby="userIconTitle" fill="none" stroke="currentColor">
@@ -278,50 +279,81 @@ if (!isset($_SESSION['loginName'])) {
             </header>
 
             <ul class="px-6 space-y-4">
-                <?php foreach($_SESSION['users'] as $userDetails) : ?>
-                    <?php $isCurrentUser = ($_SESSION['loginName'] === $userDetails['uname'] || $_SESSION['loginName'] === $userDetails['email'] || $_SESSION['loginName'] === $userDetails['phone']) ?>
+                <?php
+                $sql = "SELECT * FROM `users`";
+                $result = $conn->query($sql);
+                ?>
+                <?php foreach ($result->fetch_all(MYSQLI_ASSOC) as $userDetails): ?>
+                    <?php $isCurrentUser = ($_SESSION['loginName'] === $userDetails['username'] || $_SESSION['loginName'] === $userDetails['email'] || $_SESSION['loginName'] === $userDetails['phone']) ?>
                     <li class="flex gap-5 shadow-md bg-white py-2.5 px-6 rounded">
                         <div class="bg-red-800 w-4 h-4 rounded-full mt-1.5"></div>
                         <div>
-                            <h3 class="text-xl font-semibold"><?= $userDetails['fname']; ?></h3>
-                            <p class="text-lg font-medium"><?= $userDetails['uname']; ?></p>
+                            <h3 class="text-xl font-semibold"><?= $userDetails['name']; ?></h3>
+                            <p class="text-lg font-medium"><?= $userDetails['username']; ?></p>
                             <dl class="flex gap-4">
                                 <div class="flex items-center gap-2">
                                     <dt class="font-medium">Email Address:</dt>
-                                    <dd><a href="mailto:<?= $isCurrentUser ? $userDetails['email'] : ""; ?>"><?= $isCurrentUser ? $userDetails['email'] : substr($userDetails['email'], 0, 2).str_repeat("x", strlen($userDetails['email'])-5).substr($userDetails['email'], -3); ?></a></dd>
+                                    <dd><a
+                                            href="mailto:<?= $isCurrentUser ? $userDetails['email'] : ""; ?>"><?= $isCurrentUser ? $userDetails['email'] : substr($userDetails['email'], 0, 2) . str_repeat("x", strlen($userDetails['email']) - 5) . substr($userDetails['email'], -3); ?></a>
+                                    </dd>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <dt class="font-medium">Phone Number:</dt>
-                                    <dd><a href="tel:+<?= $isCurrentUser ? $userDetails['phone'] : ""; ?>"><?= $isCurrentUser ? $userDetails['phone'] : substr($userDetails['phone'], 0, 2).str_repeat("x", 4).substr($userDetails['phone'], -4); ?></a></dd>
+                                    <dd><a
+                                            href="tel:+<?= $isCurrentUser ? $userDetails['phone'] : ""; ?>"><?= $isCurrentUser ? $userDetails['phone'] : substr($userDetails['phone'], 0, 2) . str_repeat("x", 4) . substr($userDetails['phone'], -4); ?></a>
+                                    </dd>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <dt class="font-medium">Password:</dt>
-                                    <dd><?= $isCurrentUser ? $userDetails['password'] : str_repeat("*", strlen($userDetails['password'])); ?></dd>
+                                    <dd><?= $isCurrentUser ? $userDetails['password'] : str_repeat("*", strlen($userDetails['password'])); ?>
+                                    </dd>
                                 </div>
                             </dl>
                         </div>
-                        <div class="items-center flex-wrap gap-12 ml-auto text-sm text-center <?= $isCurrentUser ? "flex" : "hidden" ?>">
-                            <button type="button" class="">
-                                <svg class="w-6 h-6 cursor-pointer" height="24" width="24"
-                                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                    <path
-                                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
-                                    </path>
-                                    <title>Edit</title>
-                                </svg>
-                            </button>
-                            <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
-                                <button name="deleteUser" id="deleteUser">
-                                    <svg class="w-7 h-7 text-red-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                        fill="currentColor">
-                                        <path d="M0 0h24v24H0V0z" fill="none"></path>
+                        <div class="ml-auto flex flex-col justify-between">
+                            <dl class="flex items-center justify-end gap-2">
+                                <dt class="font-medium">ID:</dt>
+                                <dd class="bg-yellow-300 rounded-md text-sm font-bold text-red-600 text-center px-2 py-0.5">
+                                    <?= $userDetails['id']; ?></dd>
+                            </dl>
+                            <div
+                                class="items-center flex-wrap gap-12 text-sm text-center <?= $isCurrentUser ? "flex" : "hidden" ?>">
+                                <span class="<?= $userDetails['active'] ? 'bg-green-400 text-green-700' : 'bg-red-400 text-red-700'; ?> rounded-full px-3 font-medium">Inactive</span>
+                                <button type="button" class="">
+                                    <svg class="w-6 h-6 cursor-pointer" height="24" width="24"
+                                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                         <path
-                                            d="M6 21h12V7H6v14zm2.46-9.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4h-3.5z">
+                                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
                                         </path>
-                                        <title>Delete</title>
+                                        <title>Edit</title>
                                     </svg>
                                 </button>
-                            </form>
+                                <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+                                    <button name="<?= $userDetails['active'] ? 'lockUser' : 'unlockUser'; ?>"
+                                        id="lockUnlockUser">
+                                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg"
+                                            enable-background="new 0 0 24 24" viewBox="0 0 24 24" fill="currentColor">
+                                            <rect fill="none" height="24" width="24"></rect>
+                                            <path
+                                                d="M13,3c-4.97,0-9,4.03-9,9c0,0.06,0.01,0.12,0.01,0.19l-1.84-1.84l-1.41,1.41L5,16l4.24-4.24l-1.41-1.41l-1.82,1.82 C6.01,12.11,6,12.06,6,12c0-3.86,3.14-7,7-7s7,3.14,7,7s-3.14,7-7,7c-1.9,0-3.62-0.76-4.88-1.99L6.7,18.42 C8.32,20.01,10.55,21,13,21c4.97,0,9-4.03,9-9S17.97,3,13,3z M15,11v-1c0-1.1-0.9-2-2-2s-2,0.9-2,2v1c-0.55,0-1,0.45-1,1v3 c0,0.55,0.45,1,1,1h4c0.55,0,1-0.45,1-1v-3C16,11.45,15.55,11,15,11z M14,11h-2v-1c0-0.55,0.45-1,1-1s1,0.45,1,1V11z">
+                                            </path>
+                                            <title><?= $userDetails['active'] ? 'Lock User' : 'Unlock User' ?></title>
+                                        </svg>
+                                    </button>
+                                </form>
+                                <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+                                    <button name="deleteUser" id="deleteUser">
+                                        <svg class="w-7 h-7 text-red-600" xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M0 0h24v24H0V0z" fill="none"></path>
+                                            <path
+                                                d="M6 21h12V7H6v14zm2.46-9.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4h-3.5z">
+                                            </path>
+                                            <title>Delete</title>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </li>
                 <?php endforeach; ?>
