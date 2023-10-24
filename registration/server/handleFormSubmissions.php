@@ -4,12 +4,14 @@ $_SESSION['users'] ?? $_SESSION['users'] = [];
 $isDataValid = true;
 $loginNameErr = $loginPasswordErr = '';
 require "../server/validationFunctions.php";
+require "../server/dbConnection.php";
 
 // Handle Registration Form
 if (isset($_POST['register'])) {
     $registrationErr = [
         'fnameErr' => validateTextData($_POST['fname'], $isDataValid),
         'unameErr' => validateUsername($_POST['uname'], $isDataValid),
+        'genderErr' => validateGender($_POST['gender'] ?? null, $isDataValid),
         'emailErr' => validateEmail($_POST['email'], $isDataValid),
         'phoneErr' => validatePhoneNumber($_POST['phone'], $isDataValid),
         'passwordErr' => validatePasswordFormat($_POST['password'], $isDataValid),
@@ -18,8 +20,11 @@ if (isset($_POST['register'])) {
 
     if ($isDataValid) {
         unset($_POST['confirmPassword'], $_POST['register']);
-        $_SESSION['users'][$_POST['email']] = $_POST;
-        // array_push($_SESSION['users'], $_POST);
+        $sql = "INSERT INTO `users` (`name`, `username`, `gender`, `email`, `phone`, `password`) VALUES ('" . $_POST['fname'] . "', '" . $_POST['uname'] . "', '" . $_POST['gender'] . "', '" . $_POST['email'] . "', '" . $_POST['phone'] . "', '" . $_POST['password'] . "')";
+        $sql = "INSERT INTO `users` (`name`, `username`, `gender`, `email`, `phone`, `password`) VALUES ('{$_POST['fname']}', '{$_POST['uname']}', '{$_POST['gender']}', '{$_POST['email']}', '{$_POST['phone']}', '{$_POST['password']}')";
+        if (!$conn->query($sql)) {
+            die("Error creating user: " . $conn->error);
+        }
         header('Location: ../client/login.php');
         exit;
     }

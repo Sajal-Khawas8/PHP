@@ -110,6 +110,14 @@ function validateUsername(&$data, &$isDataValid)
     }
 }
 
+function validateGender($data, &$isDataValid)
+{
+    if (!isset($data)) {
+        $isDataValid = false;
+        return "*Please select Gender";
+    }
+}
+
 function validateEmail(&$data, &$isDataValid)
 {
     cleanData($data);

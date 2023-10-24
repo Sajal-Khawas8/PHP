@@ -29,6 +29,25 @@
                             class="text-red-600 text-sm font-medium"><?= $registrationErr['unameErr'] ?? ''; ?></span>
                     </div>
                 </div>
+                <div class="flex items-center gap-4 !mt-4 !-mb-2">
+                    <p class="text-lg text-gray-500">Gender:</p>
+                    <div class="flex items-center gap-2">
+                        <input type="radio" name="gender" id="male" value="Male"
+                            class="accent-indigo-600 w-3.5 h-3.5 cursor-pointer">
+                        <label for="male" class="cursor-pointer">Male</label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="radio" name="gender" id="female" value="Female"
+                            class="accent-indigo-600 w-3.5 h-3.5 cursor-pointer">
+                        <label for="female" class="cursor-pointer">Female</label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="radio" name="gender" id="other" value="Other"
+                            class="accent-indigo-600 w-3.5 h-3.5 cursor-pointer">
+                        <label for="other" class="cursor-pointer">Other</label>
+                    </div>
+                    <span class="text-red-600 text-sm font-medium"><?= $registrationErr['genderErr'] ?? ''; ?></span>
+                </div>
                 <div class="grid grid-cols-2 gap-6">
                     <div class="relative">
                         <input type="text" name="email" id="email" placeholder="Email Address"
