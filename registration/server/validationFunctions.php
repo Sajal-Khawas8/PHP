@@ -76,21 +76,21 @@ function isInvalidFormat($data, &$msg, $field)
 function isRedundantData($data, &$msg, $field, $dataType)
 {
     global $conn;
-    $sql = "SELECT * FROM `users` WHERE $dataType = '{$data}'";
-    $result=$conn->query($sql);
+    $sql = "SELECT id FROM `users` WHERE $dataType = '{$data}'";
+    $result = $conn->query($sql);
     if (!$result) {
         die("Error searching user: " . $conn->error);
     }
     if ($result->num_rows > 0) {
-        $msg = "*This $field has already been taken";
-        return TRUE;
+        $id = $result->fetch_column();
+        $sql = "SELECT id FROM `users` WHERE email = '{$_SESSION['loginName']}'";
+        $result = $conn->query($sql);
+        $loginId = $result->fetch_column();
+        if ($id !== $loginId) {
+            $msg = "*This $field has already been taken";
+            return TRUE;
+        }
     }
-    // foreach ($_SESSION['users'] as $userDetails) {
-    //     if ($userDetails[$dataType] === $data) {
-    //         $msg = "*This $field has already been taken";
-    //         return TRUE;
-    //     }
-    // }
 }
 
 
@@ -129,7 +129,7 @@ function validateEmail(&$data, &$isDataValid)
     cleanData($data);
     $data = strtolower($data);
     $errMsg = NULL;
-    if (isEmpty($data, $errMsg, 'Email Address') || isInvalidFormat($data, $errMsg, 'Email Address') || isRedundantData($data, $errMsg, 'Email Address', 'email')) {
+    if (isInvalidFormat($data, $errMsg, 'Email Address') || isRedundantData($data, $errMsg, 'Email Address', 'email')) {
         $isDataValid = false;
         return $errMsg;
     }
@@ -139,13 +139,65 @@ function validatePhoneNumber(&$data, &$isDataValid)
 {
     cleanData($data);
     $errMsg = NULL;
-    if (isEmpty($data, $errMsg, 'Phone Number') || isInvalidFormat($data, $errMsg, 'Phone Number') || isRedundantData($data, $errMsg, 'Phone Number', 'phone')) {
+    if (isInvalidFormat($data, $errMsg, 'Phone Number') || isRedundantData($data, $errMsg, 'Phone Number', 'phone')) {
         $isDataValid = false;
         return $errMsg;
     }
 }
 
 function validatePasswordFormat(&$data, &$isDataValid)
+{
+    cleanData($data);
+    $errMsg = NULL;
+    if (isEmpty($data, $errMsg, 'Password') || isInvalidFormat($data, $errMsg, 'Password')) {
+        $isDataValid = false;
+        return $errMsg;
+    }
+}
+function validateEditedTextData(&$data, &$isDataValid)
+{
+    cleanData($data);
+    $data = ucwords($data);
+    $errMsg = NULL;
+    if (!empty($data) && (isInvalidMinLength($data, $errMsg, 'Name') || isInvalidMaxLength($data, $errMsg, 'Name') || isInvalidFormat($data, $errMsg, 'Name'))) {
+        $isDataValid = false;
+        return $errMsg;
+    }
+}
+
+function validateEditedUsername(&$data, &$isDataValid)
+{
+    cleanData($data);
+    $data = strtolower($data);
+    $errMsg = NULL;
+    if (!empty($data) && (isInvalidMinLength($data, $errMsg, 'Username') || isInvalidMaxLength($data, $errMsg, 'Username') || isInvalidFormat($data, $errMsg, 'Username') || isRedundantData($data, $errMsg, 'Username', 'username'))) {
+        $isDataValid = false;
+        return $errMsg;
+    }
+}
+
+function validateEditedEmail(&$data, &$isDataValid)
+{
+    cleanData($data);
+    $data = strtolower($data);
+    $errMsg = NULL;
+    if (!empty($data) && (isInvalidFormat($data, $errMsg, 'Email Address') || isRedundantData($data, $errMsg, 'Email Address', 'email'))) {
+        $isDataValid = false;
+        return $errMsg;
+    }
+}
+
+function validateEditedPhoneNumber(&$data, &$isDataValid)
+{
+    cleanData($data);
+    $errMsg = NULL;
+    if (!empty($data) && (isInvalidFormat($data, $errMsg, 'Phone Number') || isRedundantData($data, $errMsg, 'Phone Number', 'phone'))) {
+        $isDataValid = false;
+        return $errMsg;
+    }
+}
+
+function validateEditedPasswordFormat(&$data, &$isDataValid)
 {
     cleanData($data);
     $errMsg = NULL;
@@ -182,12 +234,12 @@ function searchUser($searchID)
     } else {
         $dataType = 'username';
     }
-    $sql="SELECT `email` FROM `users` WHERE $dataType = '{$searchID}'";
-    $result=$conn->query($sql);
+    $sql = "SELECT `email` FROM `users` WHERE $dataType = '{$searchID}'";
+    $result = $conn->query($sql);
     if (!$result) {
         die("Error searching data: " . $conn->error);
     }
-    if ($result->num_rows>0) {
+    if ($result->num_rows > 0) {
         return $result->fetch_column();
     }
     // foreach ($_SESSION['users'] as $userID => $userDetails) {
@@ -232,10 +284,10 @@ function validateLoginData(&$loginName, $loginPassword, &$loginNameErr, &$loginP
         $loginPasswordErr = $errMsg;
         return FALSE;
     }
-    $sql="SELECT `password` FROM `users` WHERE email='{$email}'";
-    $result=$conn->query($sql);
+    $sql = "SELECT `password` FROM `users` WHERE email='{$email}'";
+    $result = $conn->query($sql);
     if (!$result) {
-        die("Search Failed: ". $conn->error);
+        die("Search Failed: " . $conn->error);
     }
     if (!validatePassword($result->fetch_column(), $loginPassword)) {
         $loginPasswordErr = "*Invalid Password";
