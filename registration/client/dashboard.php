@@ -265,28 +265,34 @@ if (!isset($_SESSION['loginName'])) {
         <section class="teamMembers">
             <header class="py-2.5 px-6">
                 <h1 class="my-2.5 text-2xl font-medium text-center xl:text-left">Registered Users</h1>
-                <form action="#" method="post" class="w-1/2 min-w-[453px] h-[35px] lg:mx-auto xl:mx-0 relative">
-                    <input type="search" name="search" id="search" placeholder="Search by Username/Email/Phone Number"
-                        class="w-full h-full px-2.5 py-4 rounded outline-indigo-600">
-                    <button class="absolute right-0 inset-y-0 bg-slate-200 px-2 rounded-r">
-                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                            <path
-                                d="M12.9 14.32a8 8 0 1 1 1.41-1.41l5.35 5.33-1.42 1.42-5.33-5.34zM8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12z">
-                            </path>
-                        </svg>
-                    </button>
-                </form>
+                <div class="flex items-center gap-2">
+                    <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post"
+                        class="w-1/2 min-w-[453px] h-[35px] lg:mx-auto xl:mx-0 relative">
+                        <input type="search" name="searchData" placeholder="Search by Username/Email/Phone Number"
+                            class="w-full h-full px-2.5 py-4 rounded outline-indigo-600">
+                        <button name="searchUser" id="searchUser"
+                            class="absolute right-0 inset-y-0 bg-slate-200 px-2 rounded-r">
+                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path
+                                    d="M12.9 14.32a8 8 0 1 1 1.41-1.41l5.35 5.33-1.42 1.42-5.33-5.34zM8 14A6 6 0 1 0 8 2a6 6 0 0 0 0 12z">
+                                </path>
+                            </svg>
+                        </button>
+                    </form>
+                    <span class="text-red-600 text-sm font-medium"><?= $searchErr ?? '' ?></span>
+                </div>
             </header>
 
             <ul class="px-6 space-y-4">
                 <?php
                 $sql = "SELECT * FROM `users`";
                 $result = $conn->query($sql);
-                $bgColors=['bg-stone-600', 'bg-red-500', 'bg-red-700', 'bg-orange-500', 'bg-orange-700', 'bg-amber-400', 'bg-amber-700', 'bg-yellow-400', 'bg-yellow-600', 'bg-lime-400', 'bg-lime-600', 'bg-green-500', 'bg-green-700', 'bg-teal-400', 'bg-cyan-400', 'bg-cyan-600', 'bg-sky-500', 'bg-sky-700', 'bg-blue-600', 'bg-blue-800', 'bg-indigo-600', 'bg-fuchsia-500', 'bg-rose-500'];
-                foreach ($result->fetch_all(MYSQLI_ASSOC) as $userDetails): 
-                ?>
+                $bgColors = ['bg-stone-600', 'bg-red-500', 'bg-red-700', 'bg-orange-500', 'bg-orange-700', 'bg-amber-400', 'bg-amber-700', 'bg-yellow-400', 'bg-yellow-600', 'bg-lime-400', 'bg-lime-600', 'bg-green-500', 'bg-green-700', 'bg-teal-400', 'bg-cyan-400', 'bg-cyan-600', 'bg-sky-500', 'bg-sky-700', 'bg-blue-600', 'bg-blue-800', 'bg-indigo-600', 'bg-fuchsia-500', 'bg-rose-500'];
+                foreach ($result->fetch_all(MYSQLI_ASSOC) as $userDetails):
+                    ?>
                     <?php $isCurrentUser = ($_SESSION['loginName'] === $userDetails['email']) ?>
-                    <li class="flex gap-5 shadow-md bg-white py-2.5 px-6 rounded">
+                    <li class="<?= (isset($_POST['searchUser']) && (!$isSearchErr)) ? (($searchEmail === $userDetails['email']) ? 'flex' : 'hidden') : 'flex' ?> gap-5 shadow-md bg-white py-2.5 px-6 rounded">
                         <div class="<?= $bgColors[array_rand($bgColors)] ?> w-4 h-4 rounded-full mt-1.5"></div>
                         <div>
                             <h3 class="text-xl font-semibold"><?= $userDetails['name']; ?></h3>
@@ -336,7 +342,7 @@ if (!isset($_SESSION['loginName'])) {
                                 </form>
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
                                     <input type="hidden" name="id" value="<?= $userDetails['id']; ?>">
-                                    <button name="editData" <?= (!$userDetails['active'] && !$isCurrentUser) ? 'disabled' : '' ?> class="disabled:text-gray-400" >
+                                    <button name="editData" <?= (!$userDetails['active'] && !$isCurrentUser) ? 'disabled' : '' ?> class="disabled:text-gray-400">
                                         <svg class="w-6 h-6 cursor-pointer" height="24" width="24"
                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                             <path

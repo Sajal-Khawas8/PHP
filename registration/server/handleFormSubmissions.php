@@ -119,4 +119,19 @@ if (isset($_POST['update'])) {
     }
 
 }
+
+// Handle Search Bar
+if (isset($_POST['searchUser'])) {
+    $isSearchErr=false;
+    cleanData($_POST['searchData']);
+    if (isEmpty($_POST['searchData'], $searchErr, 'Username / Email Address or Phone Number')) {
+        $isSearchErr=true;
+    } else {
+        $searchEmail=searchUser($_POST['searchData']);
+        if (stristr($searchEmail, "Invalid")) {
+            $isSearchErr=true;
+            $searchErr = $searchEmail;
+        }
+    }
+}
 ?>
