@@ -282,11 +282,12 @@ if (!isset($_SESSION['loginName'])) {
                 <?php
                 $sql = "SELECT * FROM `users`";
                 $result = $conn->query($sql);
+                $bgColors=['bg-stone-600', 'bg-red-500', 'bg-red-700', 'bg-orange-500', 'bg-orange-700', 'bg-amber-400', 'bg-amber-700', 'bg-yellow-400', 'bg-yellow-600', 'bg-lime-400', 'bg-lime-600', 'bg-green-500', 'bg-green-700', 'bg-teal-400', 'bg-cyan-400', 'bg-cyan-600', 'bg-sky-500', 'bg-sky-700', 'bg-blue-600', 'bg-blue-800', 'bg-indigo-600', 'bg-fuchsia-500', 'bg-rose-500'];
+                foreach ($result->fetch_all(MYSQLI_ASSOC) as $userDetails): 
                 ?>
-                <?php foreach ($result->fetch_all(MYSQLI_ASSOC) as $userDetails): ?>
-                    <?php $isCurrentUser = ($_SESSION['loginName'] === $userDetails['username'] || $_SESSION['loginName'] === $userDetails['email'] || $_SESSION['loginName'] === $userDetails['phone']) ?>
+                    <?php $isCurrentUser = ($_SESSION['loginName'] === $userDetails['email']) ?>
                     <li class="flex gap-5 shadow-md bg-white py-2.5 px-6 rounded">
-                        <div class="bg-red-800 w-4 h-4 rounded-full mt-1.5"></div>
+                        <div class="<?= $bgColors[array_rand($bgColors)] ?> w-4 h-4 rounded-full mt-1.5"></div>
                         <div>
                             <h3 class="text-xl font-semibold"><?= $userDetails['name']; ?></h3>
                             <p class="text-lg font-medium"><?= $userDetails['username']; ?></p>
