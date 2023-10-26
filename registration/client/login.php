@@ -23,6 +23,9 @@
                 <button name="login" id="login"
                     class="w-full px-4 py-2 bg-indigo-600 text-white text-lg font-medium rounded-md hover:bg-indigo-800">Login</button>
             </form>
+            <footer>
+                <p class="text-lg">Not a user? <a href="./index.php" class="text-indigo-600 font-medium">Create an Account</a></p>
+            </footer>
         </article>
     </div>
 </body>

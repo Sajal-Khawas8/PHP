@@ -244,10 +244,10 @@ if (!isset($_SESSION['loginName'])) {
     <main class="flex-1 bg-gray-100 overflow-x-hidden overflow-y-auto">
         <header class="flex justify-between items-center text-sm py-2.5 px-6">
             <?php
-            $sql = "SELECT name FROM `users` WHERE email='{$_SESSION['loginName']}' OR username='{$_SESSION['loginName']}' OR phone='{$_SESSION['loginName']}'";
+            $sql = "SELECT name FROM `users` WHERE email='{$_SESSION['loginName']}'";
             $result = $conn->query($sql);
             if (!$result) {
-                die("Error: " . $conn->error);
+                die("Error searching user: " . $conn->error);
             }
             $name = $result->fetch_column();
             echo '<h3 class="text-lg font-medium">Welcome, ' . $name . '</h3>';
@@ -321,18 +321,6 @@ if (!isset($_SESSION['loginName'])) {
                                     class="<?= $userDetails['active'] ? 'bg-green-400 text-green-700' : 'bg-red-400 text-red-700'; ?> rounded-full px-3 font-medium"><?= $userDetails['active'] ? 'Active' : 'Inactive' ?></span>
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
                                     <input type="hidden" name="id" value="<?= $userDetails['id']; ?>">
-                                    <button name="editData">
-                                        <svg class="w-6 h-6 cursor-pointer" height="24" width="24"
-                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                            <path
-                                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
-                                            </path>
-                                            <title>Edit</title>
-                                        </svg>
-                                    </button>
-                                </form>
-                                <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
-                                    <input type="hidden" name="id" value="<?= $userDetails['id']; ?>">
                                     <button name="<?= $userDetails['active'] ? 'lockUser' : 'unlockUser'; ?>"
                                         id="lockUnlockUser">
                                         <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg"
@@ -345,8 +333,20 @@ if (!isset($_SESSION['loginName'])) {
                                         </svg>
                                     </button>
                                 </form>
+                                <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
+                                    <input type="hidden" name="id" value="<?= $userDetails['id']; ?>">
+                                    <button name="editData" <?= (!$userDetails['active'] && !$isCurrentUser) ? 'disabled' : '' ?> class="disabled:text-gray-400" >
+                                        <svg class="w-6 h-6 cursor-pointer" height="24" width="24"
+                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path
+                                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
+                                            </path>
+                                            <title>Edit</title>
+                                        </svg>
+                                    </button>
+                                </form>
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post"
-                                    class=" <?= $isCurrentUser ? "opacity-100" : "opacity-0" ?>">
+                                    class=" <?= $isCurrentUser ? "visible" : "invisible" ?>">
                                     <button name="deleteUser" id="deleteUser">
                                         <svg class="w-7 h-7 text-red-600" xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 24 24" fill="currentColor">
@@ -354,7 +354,7 @@ if (!isset($_SESSION['loginName'])) {
                                             <path
                                                 d="M6 21h12V7H6v14zm2.46-9.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4h-3.5z">
                                             </path>
-                                            <title>Delete</title>
+                                            <title>Delete Account</title>
                                         </svg>
                                     </button>
                                 </form>

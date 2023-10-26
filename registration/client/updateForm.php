@@ -64,17 +64,17 @@
                 </div>
                 <div class="grid grid-cols-2 gap-6">
                     <div class="relative">
-                        <input type="password" name="password" id="password" placeholder="Password"
+                        <input type="password" name="oldPassword" id="oldPassword" placeholder="Old Password"
+                            class="w-full px-4 py-2 border border-gray-600 rounded outline-indigo-600 placeholder:text-gray-500">
+                        <span
+                            class="text-red-600 text-sm font-medium"><?= $updationErr['oldPasswordErr'] ?? ''; ?></span>
+                    </div>
+                    <div class="relative">
+                        <input type="password" name="password" id="newPassword"
+                            placeholder="New Password"
                             class="w-full px-4 py-2 border border-gray-600 rounded outline-indigo-600 placeholder:text-gray-500">
                         <span
                             class="text-red-600 text-sm font-medium"><?= $updationErr['passwordErr'] ?? ''; ?></span>
-                    </div>
-                    <div class="relative">
-                        <input type="password" name="confirmPassword" id="confirmPassword"
-                            placeholder="Confirm Password"
-                            class="w-full px-4 py-2 border border-gray-600 rounded outline-indigo-600 placeholder:text-gray-500">
-                        <span
-                            class="text-red-600 text-sm font-medium"><?= $updationErr['cnfrmPasswordErr'] ?? ''; ?></span>
                     </div>
                 </div>
 
