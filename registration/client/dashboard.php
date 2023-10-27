@@ -252,7 +252,7 @@ if (!isset($_SESSION['loginName'])) {
             $name = $result->fetch_column();
             echo '<h3 class="text-lg font-medium">Welcome, ' . $name . '</h3>';
             ?>
-            <svg class="w-8 h-8" height="36" width="36" xmlns="http://www.w3.org/2000/svg" role="img"
+            <svg class="w-10 h-10" height="36" width="36" xmlns="http://www.w3.org/2000/svg" role="img"
                 viewBox="0 0 24 24" aria-labelledby="userIconTitle" fill="none" stroke="currentColor">
                 <title id="userIconTitle">User</title>
                 <circle cx="12" cy="12" r="10" fill="#ffa000db"></circle>
@@ -292,8 +292,8 @@ if (!isset($_SESSION['loginName'])) {
                 foreach ($result->fetch_all(MYSQLI_ASSOC) as $userDetails):
                     ?>
                     <?php $isCurrentUser = ($_SESSION['loginName'] === $userDetails['email']) ?>
-                    <li class="<?= (isset($_POST['searchUser']) && (!$isSearchErr)) ? (($searchEmail === $userDetails['email']) ? 'flex' : 'hidden') : 'flex' ?> gap-5 shadow-md bg-white py-2.5 px-6 rounded">
-                        <div class="<?= $bgColors[array_rand($bgColors)] ?> w-4 h-4 rounded-full mt-1.5"></div>
+                    <li class="<?= (isset($_POST['searchUser']) && (!$isSearchErr)) ? (($searchEmail === $userDetails['email']) ? 'flex' : 'hidden') : 'flex' ?> items-center gap-5 shadow-md bg-white py-2.5 px-6 rounded">
+                        <div class="<?= $bgColors[array_rand($bgColors)] ?> w-8 h-8 rounded-full mt-1.5"></div>
                         <div>
                             <h3 class="text-xl font-semibold"><?= $userDetails['name']; ?></h3>
                             <p class="text-lg font-medium"><?= $userDetails['username']; ?></p>
@@ -317,7 +317,7 @@ if (!isset($_SESSION['loginName'])) {
                                 </div>
                             </dl>
                         </div>
-                        <div class="ml-auto flex flex-col justify-between">
+                        <div class="ml-auto h-20 flex flex-col justify-between">
                             <dl class="flex items-center justify-end gap-2">
                                 <dt class="font-medium">ID:</dt>
                                 <dd class="bg-yellow-300 rounded-md text-sm font-bold text-red-600 text-center px-2 py-0.5">

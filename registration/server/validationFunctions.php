@@ -253,6 +253,14 @@ function validateCnfrmPassword($cnfrmPassword, $password, &$isDataValid)
     }
 }
 
+function validatePictureFormat($uploadedFile, $isDataValid)
+{
+    if (!in_array(strtolower(pathinfo($uploadedFile['name'])['extension']), ['jpg', 'png'])) {
+        $isDataValid = false;
+        return "*Please select jpg or png file";
+    }
+}
+
 function searchUser($searchID)
 {
     global $conn;

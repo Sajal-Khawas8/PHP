@@ -15,6 +15,7 @@ if (isset($_POST['register'])) {
         'phoneErr' => validatePhoneNumber($_POST['phone'], $isDataValid),
         'passwordErr' => validatePasswordFormat($_POST['password'], $isDataValid),
         'cnfrmPasswordErr' => validateCnfrmPassword($_POST['confirmPassword'], $_POST['password'], $isDataValid),
+        'pictureErr' => validatePictureFormat($_FILES['profilePicture'], $isDataValid)
     ];
 
     if ($isDataValid) {
