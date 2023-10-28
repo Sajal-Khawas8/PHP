@@ -4,6 +4,7 @@ $isDataValid = true;
 $loginNameErr = $loginPasswordErr = '';
 require "../server/dbConnection.php";
 require "../server/validationFunctions.php";
+date_default_timezone_set('Asia/Kolkata');
 
 // Handle Registration Form
 if (isset($_POST['register'])) {
@@ -23,6 +24,23 @@ if (isset($_POST['register'])) {
         $sql = "INSERT INTO `users` (`name`, `username`, `gender`, `email`, `phone`, `password`) VALUES ('{$_POST['fname']}', '{$_POST['uname']}', '{$_POST['gender']}', '{$_POST['email']}', '{$_POST['phone']}', '{$_POST['password']}')";
         if (!$conn->query($sql)) {
             die("Error creating user: " . $conn->error);
+        }
+        $fileExtension=strtolower(pathinfo($_FILES['profilePicture']['name'])['extension']);
+        $fileName=pathinfo($_FILES['profilePicture']['name'])['filename'] . "." . $fileExtension;
+        $newFileName=uniqid() . "." . $fileExtension;
+        if (!move_uploaded_file($_FILES['profilePicture']['tmp_name'], "../server/uploads/images/{$newFileName}")) {
+            die("Error uploading file");
+        }
+        $sql = "SELECT id FROM `users` WHERE email = '{$_POST['email']}'";
+        $userID=$conn->query($sql);
+        if (!$userID) {
+            die("Error searching userID: " . $conn->error);
+        }
+        $userID = $userID->fetch_column();
+        $date=date("Y-m-d H:i:s");
+        $sql="INSERT INTO `userImg` (`user_id`, `display_name`, `unique_name`, `creation_date`) VALUES ('{$userID}', '{$fileName}', '{$newFileName}', '{$date}')";
+        if (!$conn->query($sql)) {
+            die("Error uploading profile picture: " . $conn->error);
         }
         header('Location: ../client/login.php');
         exit;
