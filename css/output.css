@@ -654,6 +654,22 @@ video {
   right: 0px;
 }
 
+.right-1{
+  right: 0.25rem;
+}
+
+.top-0{
+  top: 0px;
+}
+
+.right-4{
+  right: 1rem;
+}
+
+.top-0\.5{
+  top: 0.125rem;
+}
+
 .isolate{
   isolation: isolate;
 }
@@ -741,6 +757,10 @@ video {
   margin-left: auto;
 }
 
+.mr-4{
+  margin-right: 1rem;
+}
+
 .mt-1{
   margin-top: 0.25rem;
 }
@@ -786,6 +806,10 @@ video {
 
 .flex{
   display: flex;
+}
+
+.\!flex{
+  display: flex !important;
 }
 
 .inline-flex{
@@ -872,10 +896,6 @@ video {
   height: 0.875rem;
 }
 
-.h-4{
-  height: 1rem;
-}
-
 .h-5{
   height: 1.25rem;
 }
@@ -904,6 +924,30 @@ video {
   height: 100vh;
 }
 
+.h-24{
+  height: 6rem;
+}
+
+.h-32{
+  height: 8rem;
+}
+
+.h-64{
+  height: 16rem;
+}
+
+.h-56{
+  height: 14rem;
+}
+
+.h-72{
+  height: 18rem;
+}
+
+.h-52{
+  height: 13rem;
+}
+
 .w-1\/2{
   width: 50%;
 }
@@ -922,10 +966,6 @@ video {
 
 .w-3\.5{
   width: 0.875rem;
-}
-
-.w-4{
-  width: 1rem;
 }
 
 .w-5{
@@ -955,6 +995,26 @@ video {
 
 .w-full{
   width: 100%;
+}
+
+.w-24{
+  width: 6rem;
+}
+
+.w-32{
+  width: 8rem;
+}
+
+.w-96{
+  width: 24rem;
+}
+
+.w-56{
+  width: 14rem;
+}
+
+.w-52{
+  width: 13rem;
 }
 
 .min-w-\[453px\]{
@@ -1522,10 +1582,6 @@ video {
   gap: 1.5rem;
 }
 
-.gap-7{
-  gap: 1.75rem;
-}
-
 .space-x-2 > :not([hidden]) ~ :not([hidden]){
   --tw-space-x-reverse: 0;
   margin-right: calc(0.5rem * var(--tw-space-x-reverse));
@@ -1554,6 +1610,12 @@ video {
   --tw-space-y-reverse: 0;
   margin-top: calc(1.75rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(1.75rem * var(--tw-space-y-reverse));
+}
+
+.space-y-2 > :not([hidden]) ~ :not([hidden]){
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.5rem * var(--tw-space-y-reverse));
 }
 
 .space-y-reverse > :not([hidden]) ~ :not([hidden]){
@@ -1924,6 +1986,10 @@ video {
   border-width: 1px;
 }
 
+.border-0{
+  border-width: 0px;
+}
+
 .border-x{
   border-left-width: 1px;
   border-right-width: 1px;
@@ -2036,6 +2102,11 @@ video {
   background-color: rgb(229 231 235 / 0.7);
 }
 
+.bg-gray-400{
+  --tw-bg-opacity: 1;
+  background-color: rgb(156 163 175 / var(--tw-bg-opacity));
+}
+
 .bg-green-400{
   --tw-bg-opacity: 1;
   background-color: rgb(74 222 128 / var(--tw-bg-opacity));
@@ -2121,6 +2192,11 @@ video {
   background-color: rgb(45 212 191 / var(--tw-bg-opacity));
 }
 
+.bg-violet-50{
+  --tw-bg-opacity: 1;
+  background-color: rgb(245 243 255 / var(--tw-bg-opacity));
+}
+
 .bg-white{
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
@@ -2139,6 +2215,14 @@ video {
 .bg-yellow-600{
   --tw-bg-opacity: 1;
   background-color: rgb(202 138 4 / var(--tw-bg-opacity));
+}
+
+.bg-gray-400\/70{
+  background-color: rgb(156 163 175 / 0.7);
+}
+
+.bg-gray-300\/70{
+  background-color: rgb(209 213 219 / 0.7);
 }
 
 .decoration-slice{
@@ -2538,14 +2622,19 @@ video {
   color: rgb(185 28 28 / var(--tw-text-opacity));
 }
 
-.text-white{
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity));
-}
-
 .text-slate-500{
   --tw-text-opacity: 1;
   color: rgb(100 116 139 / var(--tw-text-opacity));
+}
+
+.text-violet-700{
+  --tw-text-opacity: 1;
+  color: rgb(109 40 217 / var(--tw-text-opacity));
+}
+
+.text-white{
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
 .underline{
@@ -2956,11 +3045,6 @@ video {
   color: rgb(109 40 217 / var(--tw-text-opacity));
 }
 
-.file\:text-white::file-selector-button{
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity));
-}
-
 .placeholder\:text-gray-500::-moz-placeholder{
   --tw-text-opacity: 1;
   color: rgb(107 114 128 / var(--tw-text-opacity));
@@ -2971,9 +3055,18 @@ video {
   color: rgb(107 114 128 / var(--tw-text-opacity));
 }
 
+.hover\:cursor-pointer:hover{
+  cursor: pointer;
+}
+
 .hover\:bg-indigo-800:hover{
   --tw-bg-opacity: 1;
   background-color: rgb(55 48 163 / var(--tw-bg-opacity));
+}
+
+.hover\:bg-violet-100:hover{
+  --tw-bg-opacity: 1;
+  background-color: rgb(237 233 254 / var(--tw-bg-opacity));
 }
 
 .hover\:font-bold:hover{

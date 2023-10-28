@@ -286,14 +286,19 @@ if (!isset($_SESSION['loginName'])) {
 
             <ul class="px-6 space-y-4">
                 <?php
-                $sql = "SELECT * FROM `users`";
+                $sql = "SELECT * FROM `users` LEFT JOIN `userimg` ON `users`.`id` = `userimg`.`user_id` ORDER BY id";
                 $result = $conn->query($sql);
+                if (!$result) {
+                    die("Error searching users: " . $conn->error);
+                }
                 $bgColors = ['bg-stone-600', 'bg-red-500', 'bg-red-700', 'bg-orange-500', 'bg-orange-700', 'bg-amber-400', 'bg-amber-700', 'bg-yellow-400', 'bg-yellow-600', 'bg-lime-400', 'bg-lime-600', 'bg-green-500', 'bg-green-700', 'bg-teal-400', 'bg-cyan-400', 'bg-cyan-600', 'bg-sky-500', 'bg-sky-700', 'bg-blue-600', 'bg-blue-800', 'bg-indigo-600', 'bg-fuchsia-500', 'bg-rose-500'];
                 foreach ($result->fetch_all(MYSQLI_ASSOC) as $userDetails):
                     ?>
                     <?php $isCurrentUser = ($_SESSION['loginName'] === $userDetails['email']) ?>
                     <li class="<?= (isset($_POST['searchUser']) && (!$isSearchErr)) ? (($searchEmail === $userDetails['email']) ? 'flex' : 'hidden') : 'flex' ?> items-center gap-5 shadow-md bg-white py-2.5 px-6 rounded">
-                        <div class="<?= $bgColors[array_rand($bgColors)] ?> w-8 h-8 rounded-full mt-1.5"></div>
+                        <div class="<?= $bgColors[array_rand($bgColors)] ?> w-8 h-8 rounded-full mt-1.5">
+                        <img src="<?= "../server/uploads/images/" . $userDetails['unique_name'] ?>" alt="<?= $userDetails['name'] ?>" class="">
+                    </div>
                         <div>
                             <h3 class="text-xl font-semibold"><?= $userDetails['name']; ?></h3>
                             <p class="text-lg font-medium"><?= $userDetails['username']; ?></p>

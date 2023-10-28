@@ -87,13 +87,13 @@ if (isset($_POST['unlockUser'])) {
 
 //Handle Edit Button
 if (isset($_POST['editData'])) {
-    $sql = "SELECT * FROM `users` WHERE id='{$_POST['id']}'";
+    $sql = "SELECT * FROM `users` LEFT JOIN `userimg` ON `users`.`id` = `userimg`.`user_id` WHERE id='{$_POST['id']}'";
     $result = $conn->query($sql);
     if (!$result) {
         die("Error editing user: " . $conn->error);
     }
     $data = $result->fetch_array(MYSQLI_ASSOC);
-    header("Location: ../client/updateForm.php?id={$data['id']}&name={$data['name']}&uname={$data['username']}&gender={$data['gender']}&email={$data['email']}&phone={$data['phone']}");
+    header("Location: ../client/updateForm.php?id={$data['id']}&name={$data['name']}&uname={$data['username']}&gender={$data['gender']}&email={$data['email']}&phone={$data['phone']}&imageName={$data['display_name']}&image={$data['unique_name']}");
     exit;
 }
 
@@ -118,6 +118,7 @@ if (isset($_POST['update'])) {
         'phoneErr' => validateEditedPhoneNumber($_POST['phone'], $isDataValid),
         'oldPasswordErr' => validateOldPassword($_POST['oldPassword'], $isDataValid),
         'passwordErr' => validateNewPasswordFormat($_POST['password'], $isDataValid), # New password
+        'pictureErr' => validatePictureFormat($_FILES['profilePicture'], $isDataValid)
     ];
 
     if ($isDataValid) {
