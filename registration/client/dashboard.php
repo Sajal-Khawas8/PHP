@@ -244,15 +244,20 @@ if (!isset($_SESSION['loginName'])) {
     <main class="flex-1 bg-gray-100 overflow-x-hidden overflow-y-auto">
         <header class="flex justify-between items-center text-sm py-2.5 px-6">
             <?php
-            $sql = "SELECT name FROM `users` WHERE email='{$_SESSION['loginName']}'";
+            $sql = "SELECT name, unique_name FROM `users` LEFT JOIN `userimg` ON `users`.`id` = `userimg`.`user_id` WHERE email='{$_SESSION['loginName']}'";
             $result = $conn->query($sql);
             if (!$result) {
                 die("Error searching user: " . $conn->error);
             }
-            $name = $result->fetch_column();
+            $result=$result->fetch_assoc();
+            $name = $result['name'];
+            $image=$result['unique_name'];
             echo '<h3 class="text-lg font-medium">Welcome, ' . $name . '</h3>';
             ?>
-            <svg class="w-10 h-10" height="36" width="36" xmlns="http://www.w3.org/2000/svg" role="img"
+            <div class="<?= $image === null ? 'hidden' : '' ?> w-10 h-10 rounded-full">
+                <img src="<?= "../server/uploads/images/" . $image ?>" alt="<?= $name ?>" class="border-2 border-black rounded-full object-cover">
+            </div>
+            <svg class="<?= $image !== null ? 'hidden' : '' ?> w-10 h-10" height="36" width="36" xmlns="http://www.w3.org/2000/svg" role="img"
                 viewBox="0 0 24 24" aria-labelledby="userIconTitle" fill="none" stroke="currentColor">
                 <title id="userIconTitle">User</title>
                 <circle cx="12" cy="12" r="10" fill="#ffa000db"></circle>
@@ -291,46 +296,68 @@ if (!isset($_SESSION['loginName'])) {
                 if (!$result) {
                     die("Error searching users: " . $conn->error);
                 }
-                $bgColors = ['bg-stone-600', 'bg-red-500', 'bg-red-700', 'bg-orange-500', 'bg-orange-700', 'bg-amber-400', 'bg-amber-700', 'bg-yellow-400', 'bg-yellow-600', 'bg-lime-400', 'bg-lime-600', 'bg-green-500', 'bg-green-700', 'bg-teal-400', 'bg-cyan-400', 'bg-cyan-600', 'bg-sky-500', 'bg-sky-700', 'bg-blue-600', 'bg-blue-800', 'bg-indigo-600', 'bg-fuchsia-500', 'bg-rose-500'];
+                $borderColors = ['border-stone-600', 'border-red-500', 'border-red-700', 'border-orange-500', 'border-orange-700', 'border-amber-400', 'border-amber-700', 'border-yellow-400', 'border-yellow-600', 'border-lime-400', 'border-lime-600', 'border-green-500', 'border-green-700', 'border-teal-400', 'border-cyan-400', 'border-cyan-600', 'border-sky-500', 'border-sky-700', 'border-blue-600', 'border-blue-800', 'border-indigo-600', 'border-fuchsia-500', 'border-rose-500'];
                 foreach ($result->fetch_all(MYSQLI_ASSOC) as $userDetails):
                     ?>
                     <?php $isCurrentUser = ($_SESSION['loginName'] === $userDetails['email']) ?>
-                    <li class="<?= (isset($_POST['searchUser']) && (!$isSearchErr)) ? (($searchEmail === $userDetails['email']) ? 'flex' : 'hidden') : 'flex' ?> items-center gap-5 shadow-md bg-white py-2.5 px-6 rounded">
-                        <div class="<?= $bgColors[array_rand($bgColors)] ?> w-8 h-8 rounded-full mt-1.5">
-                        <img src="<?= "../server/uploads/images/" . $userDetails['unique_name'] ?>" alt="<?= $userDetails['name'] ?>" class="">
-                    </div>
-                        <div>
-                            <h3 class="text-xl font-semibold"><?= $userDetails['name']; ?></h3>
-                            <p class="text-lg font-medium"><?= $userDetails['username']; ?></p>
-                            <dl class="flex gap-4">
-                                <div class="flex items-center gap-2">
-                                    <dt class="font-medium">Email Address:</dt>
-                                    <dd><a
-                                            href="mailto:<?= $isCurrentUser ? $userDetails['email'] : ""; ?>"><?= $isCurrentUser ? $userDetails['email'] : substr($userDetails['email'], 0, 2) . str_repeat("x", strlen($userDetails['email']) - 5) . substr($userDetails['email'], -3); ?></a>
-                                    </dd>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <dt class="font-medium">Phone Number:</dt>
-                                    <dd><a
-                                            href="tel:+<?= $isCurrentUser ? $userDetails['phone'] : ""; ?>"><?= $isCurrentUser ? $userDetails['phone'] : substr($userDetails['phone'], 0, 2) . str_repeat("x", 4) . substr($userDetails['phone'], -4); ?></a>
-                                    </dd>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <dt class="font-medium">Password:</dt>
-                                    <dd><?= $isCurrentUser ? $userDetails['password'] : str_repeat("*", strlen($userDetails['password'])); ?>
-                                    </dd>
-                                </div>
-                            </dl>
+                    <li
+                        class="<?= (isset($_POST['searchUser']) && (!$isSearchErr)) ? (($searchEmail === $userDetails['email']) ? 'flex' : 'hidden') : 'flex' ?> items-center gap-5 shadow-md bg-white py-2.5 px-6 rounded">
+                        <div class="w-11 h-11 mt-1.5">
+                            <img src="<?= "../server/uploads/images/" . $userDetails['unique_name'] ?>"
+                                alt="<?= $userDetails['name'] ?>"
+                                class="w-full h-full object-cover rounded-full border-2 <?= $borderColors[array_rand($borderColors)] ?>">
                         </div>
-                        <div class="ml-auto h-20 flex flex-col justify-between">
-                            <dl class="flex items-center justify-end gap-2">
-                                <dt class="font-medium">ID:</dt>
-                                <dd class="bg-yellow-300 rounded-md text-sm font-bold text-red-600 text-center px-2 py-0.5">
-                                    <?= $userDetails['id']; ?></dd>
-                            </dl>
-                            <div class="flex items-center flex-wrap gap-12 text-sm text-center">
+                        <div class="">
+                            <h3 class="text-xl font-semibold"><?= $userDetails['name']; ?></h3>
+                            <div class="flex gap-12 items-end">
+                                <div>
+                                    <p class="text-lg font-medium"><?= $userDetails['username']; ?></p>
+                                    <dl>
+                                        <div class="flex gap-2">
+                                            <dt class="font-medium">Email Address:</dt>
+                                            <dd>
+                                                <a
+                                                    href="mailto:<?= $isCurrentUser ? $userDetails['email'] : ""; ?>"><?= $isCurrentUser ? $userDetails['email'] : substr($userDetails['email'], 0, 2) . str_repeat("x", strlen($userDetails['email']) - 5) . substr($userDetails['email'], -3); ?></a>
+                                            </dd>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <dt class="font-medium">Phone Number:</dt>
+                                            <dd>
+                                                <a
+                                                    href="tel:+<?= $isCurrentUser ? $userDetails['phone'] : ""; ?>"><?= $isCurrentUser ? $userDetails['phone'] : substr($userDetails['phone'], 0, 2) . str_repeat("x", 4) . substr($userDetails['phone'], -4); ?></a>
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                                <dl>
+                                    <div class="<?= $isCurrentUser ? 'flex' : 'hidden'; ?> gap-2">
+                                        <dt class="font-medium">Password:</dt>
+                                        <dd><?= $isCurrentUser ? $userDetails['password'] : str_repeat("*", strlen($userDetails['password'])); ?>
+                                        </dd>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <dt class="font-medium">Account Created:</dt>
+                                        <dd>2023-10-29 20:15:50</dd>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <dt class="font-medium">Last Updated:</dt>
+                                        <dd>2023-10-29 20:15:50</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+                        <div class="ml-auto h-24 flex flex-col justify-between">
+                            <div class="flex items-center gap-12">
                                 <span
                                     class="<?= $userDetails['active'] ? 'bg-green-400 text-green-700' : 'bg-red-400 text-red-700'; ?> rounded-full px-3 font-medium"><?= $userDetails['active'] ? 'Active' : 'Inactive' ?></span>
+                                <dl class="flex gap-2">
+                                    <dt class="font-medium">ID:</dt>
+                                    <dd
+                                        class="bg-yellow-300 rounded-md text-sm font-bold text-red-600 text-center px-2 py-0.5">
+                                        <?= $userDetails['id']; ?></dd>
+                                </dl>
+                            </div>
+                            <div class="flex items-center justify-end gap-12 text-sm text-center">
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
                                     <input type="hidden" name="id" value="<?= $userDetails['id']; ?>">
                                     <button name="<?= $userDetails['active'] ? 'lockUser' : 'unlockUser'; ?>"
@@ -358,8 +385,8 @@ if (!isset($_SESSION['loginName'])) {
                                     </button>
                                 </form>
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post"
-                                    class=" <?= $isCurrentUser ? "visible" : "invisible" ?>">
-                                    <button name="deleteUser" id="deleteUser">
+                                    class=" <?= $isCurrentUser ? "block" : "hidden" ?>">
+                                    <button name="deleteUser" id="deleteUser" <?= $isCurrentUser ? '' : 'disabled' ?>>
                                         <svg class="w-7 h-7 text-red-600" xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 24 24" fill="currentColor">
                                             <path d="M0 0h24v24H0V0z" fill="none"></path>

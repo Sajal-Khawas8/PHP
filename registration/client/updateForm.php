@@ -14,7 +14,7 @@
     <div class="bg-gray-200/70 flex items-center justify-center h-screen">
         <article class="w-1/3 bg-white p-4 space-y-5">
             <h1 class="text-4xl font-semibold text-center">Update Form</h1>
-            <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" class="space-y-7 py-5">
+            <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data" class="space-y-7 py-5">
                 <div class="grid grid-cols-2 gap-6">
                     <div class="">
                         <input type="text" name="name" id="name" placeholder="Full Name" value="<?= $_GET['name'] ?? '' ?>"
@@ -65,16 +65,31 @@
                             <div class="relative w-96 bg-white py-4 space-y-2">
                                 <h3 class="text-xl font-semibold text-center">Uploaded Image</h3>
                                 <button type="button" id="closeImageModal" class="absolute top-0.5 right-4">
-                                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 24 24" fill="currentColor">
+                                    <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 24 24" fill="currentColor">
                                         <path
                                             d="m7.314 5.9 3.535-3.536A1 1 0 1 0 9.435.95L5.899 4.485 2.364.95A1 1 0 1 0 .95 2.364l3.535 3.535L.95 9.435a1 1 0 1 0 1.414 1.414l3.535-3.535 3.536 3.535a1 1 0 1 0 1.414-1.414L7.314 5.899z">
                                         </path>
                                     </svg>
                                 </button>
-                                <figure class="mx-auto">
-                                    <img src="<?= "../server/uploads/images/" . $_GET['image'] ?>" alt="" class="w-52 h-52 mx-auto">
+                                
+                                <!-- show if user has uploaded image -->
+                                <figure class="<?= empty($_GET['image']) ? 'hidden' : '' ?>">
+                                    <img src="<?= "../server/uploads/images/" . $_GET['image'] ?>" alt="<?= $_GET['imageName']; ?>" class="w-52 h-52 mx-auto">
                                     <figcaption class="text-lg font-medium text-center"><?= $_GET['imageName']; ?></figcaption>
                                 </figure>
+
+                                <!-- show if user hasn't uploaded image -->
+                                <div class="<?= empty($_GET['image']) ? 'flex' : 'hidden' ?> gap-6 items-center px-4 py-3">
+                                    <div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"
+                                            class="h-6 w-6 text-yellow-400">
+                                            <path fill-rule="evenodd"
+                                                d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z"
+                                                clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                    <p class="font-medium">You have not uploaded your profile picture!</p>
+                                </div>
                             </div>
                         </section>
                     </div>
@@ -109,7 +124,7 @@
                             class="text-red-600 text-sm font-medium"><?= $updationErr['passwordErr'] ?? ''; ?></span>
                     </div>
                 </div>
-
+                <input type="hidden" name="id" value="<?= $_GET['id'] ?? ''; ?>">
                 <button name="update" id="update"
                     class="w-full px-4 py-2 bg-indigo-600 text-white text-lg font-medium rounded-md hover:bg-indigo-800">Update</button>
             </form>

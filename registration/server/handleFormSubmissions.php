@@ -25,22 +25,25 @@ if (isset($_POST['register'])) {
         if (!$conn->query($sql)) {
             die("Error creating user: " . $conn->error);
         }
-        $fileExtension=strtolower(pathinfo($_FILES['profilePicture']['name'])['extension']);
-        $fileName=pathinfo($_FILES['profilePicture']['name'])['filename'] . "." . $fileExtension;
-        $newFileName=uniqid() . "." . $fileExtension;
-        if (!move_uploaded_file($_FILES['profilePicture']['tmp_name'], "../server/uploads/images/{$newFileName}")) {
-            die("Error uploading file");
-        }
-        $sql = "SELECT id FROM `users` WHERE email = '{$_POST['email']}'";
-        $userID=$conn->query($sql);
-        if (!$userID) {
-            die("Error searching userID: " . $conn->error);
-        }
-        $userID = $userID->fetch_column();
-        $date=date("Y-m-d H:i:s");
-        $sql="INSERT INTO `userImg` (`user_id`, `display_name`, `unique_name`, `creation_date`) VALUES ('{$userID}', '{$fileName}', '{$newFileName}', '{$date}')";
-        if (!$conn->query($sql)) {
-            die("Error uploading profile picture: " . $conn->error);
+        if (!empty($_FILES['profilePicture']['name'])) {
+            # code...
+            $fileExtension = strtolower(pathinfo($_FILES['profilePicture']['name'])['extension']);
+            $fileName = pathinfo($_FILES['profilePicture']['name'])['filename'] . "." . $fileExtension;
+            $newFileName = uniqid() . "." . $fileExtension;
+            if (!move_uploaded_file($_FILES['profilePicture']['tmp_name'], "../server/uploads/images/{$newFileName}")) {
+                die("Error uploading file");
+            }
+            $sql = "SELECT id FROM `users` WHERE email = '{$_POST['email']}'";
+            $userID = $conn->query($sql);
+            if (!$userID) {
+                die("Error searching userID: " . $conn->error);
+            }
+            $userID = $userID->fetch_column();
+            $date = date("Y-m-d H:i:s");
+            $sql = "INSERT INTO `userImg` (`user_id`, `display_name`, `unique_name`, `creation_date`) VALUES ('{$userID}', '{$fileName}', '{$newFileName}', '{$date}')";
+            if (!$conn->query($sql)) {
+                die("Error uploading profile picture: " . $conn->error);
+            }
         }
         header('Location: ../client/login.php');
         exit;
@@ -52,7 +55,7 @@ if (isset($_POST['register'])) {
 if (isset($_POST['login'])) {
     if (validateLoginData($_POST['loginName'], $_POST['loginPassword'], $loginNameErr, $loginPasswordErr)) {
         $sql = "SELECT email FROM `users` WHERE email = '{$_POST['loginName']}' OR username = '{$_POST['loginName']}' OR phone = '{$_POST['loginName']}'";
-        $result=$conn->query($sql);
+        $result = $conn->query($sql);
         if (!$result) {
             die("Error in login: " . $conn->error);
         }
@@ -122,16 +125,42 @@ if (isset($_POST['update'])) {
     ];
 
     if ($isDataValid) {
-        unset($_POST['oldPassword']);
+        $id=$_POST['id'];
+        unset($_POST['oldPassword'], $_POST['id']);
         $updateStr = '';
         foreach ($_POST as $key => $value) {
             if (!empty($value)) {
-                $updateStr.=$key . " = '" . $value . "', ";
+                $updateStr .= $key . " = '" . $value . "', ";
             }
         }
-        $sql = "UPDATE `users` SET $updateStr active = true WHERE email='{$_SESSION['loginName']}'";
+        $sql = "UPDATE `users` SET $updateStr active = true WHERE id='{$id}'";
         if (!$conn->query($sql)) {
             die("Error searching user $updateStr: " . $conn->error);
+        }
+        if (!empty($_FILES['profilePicture']['name'])) {
+            $fileExtension = strtolower(pathinfo($_FILES['profilePicture']['name'])['extension']);
+            $fileName = pathinfo($_FILES['profilePicture']['name'])['filename'] . "." . $fileExtension;
+            $newFileName = uniqid() . "." . $fileExtension;
+            $date=date("Y-m-d H:i:s");
+            if (!move_uploaded_file($_FILES['profilePicture']['tmp_name'], "../server/uploads/images/{$newFileName}")) {
+                die("Error uploading file");
+            }
+            $sql="SELECT * FROM `userImg` WHERE user_id = '{$id}'";
+            $result=$conn->query($sql);
+            if (!$result) {
+                die("Error searching user image");
+            }
+            if ($result->num_rows > 0) {
+                $sql = "UPDATE `userImg` SET display_name = '{$fileName}', unique_name = '{$newFileName}', modified_date = '{$date}' WHERE `user_id` = '{$id}'";
+                if (!$conn->query($sql)) {
+                    die("Error updating profile picture: " . $conn->error);
+                }
+            } else {
+                $sql = "INSERT INTO `userImg` (`user_id`, `display_name`, `unique_name`, `creation_date`) VALUES ('{$id}', '{$fileName}', '{$newFileName}', '{$date}')";
+                if (!$conn->query($sql)) {
+                    die("Error updating profile picture: " . $conn->error);
+                }
+            }
         }
         unset($_SESSION['loginName']);
         header('Location: ../client/login.php');
@@ -142,14 +171,14 @@ if (isset($_POST['update'])) {
 
 // Handle Search Bar
 if (isset($_POST['searchUser'])) {
-    $isSearchErr=false;
+    $isSearchErr = false;
     cleanData($_POST['searchData']);
     if (isEmpty($_POST['searchData'], $searchErr, 'Username / Email Address or Phone Number')) {
-        $isSearchErr=true;
+        $isSearchErr = true;
     } else {
-        $searchEmail=searchUser($_POST['searchData']);
+        $searchEmail = searchUser($_POST['searchData']);
         if (stristr($searchEmail, "Invalid")) {
-            $isSearchErr=true;
+            $isSearchErr = true;
             $searchErr = $searchEmail;
         }
     }
