@@ -249,16 +249,18 @@ if (!isset($_SESSION['loginName'])) {
             if (!$result) {
                 die("Error searching user: " . $conn->error);
             }
-            $result=$result->fetch_assoc();
+            $result = $result->fetch_assoc();
             $name = $result['name'];
-            $image=$result['unique_name'];
+            $image = $result['unique_name'];
             echo '<h3 class="text-lg font-medium">Welcome, ' . $name . '</h3>';
             ?>
             <div class="<?= $image === null ? 'hidden' : '' ?> w-10 h-10 rounded-full">
-                <img src="<?= "../server/uploads/images/" . $image ?>" alt="<?= $name ?>" class="h-full w-full object-cover border-2 border-black rounded-full">
+                <img src="<?= "../server/uploads/images/" . $image ?>" alt="<?= $name ?>"
+                    class="h-full w-full object-cover border-2 border-black rounded-full">
             </div>
-            <svg class="<?= $image !== null ? 'hidden' : '' ?> w-10 h-10" height="36" width="36" xmlns="http://www.w3.org/2000/svg" role="img"
-                viewBox="0 0 24 24" aria-labelledby="userIconTitle" fill="none" stroke="currentColor">
+            <svg class="<?= $image !== null ? 'hidden' : '' ?> w-10 h-10" height="36" width="36"
+                xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 24 24" aria-labelledby="userIconTitle"
+                fill="none" stroke="currentColor">
                 <title id="userIconTitle">User</title>
                 <circle cx="12" cy="12" r="10" fill="#ffa000db"></circle>
                 <path stroke-linecap="round" fill="#000"
@@ -297,6 +299,7 @@ if (!isset($_SESSION['loginName'])) {
                     die("Error searching users: " . $conn->error);
                 }
                 $borderColors = ['border-stone-600', 'border-red-500', 'border-red-700', 'border-orange-500', 'border-orange-700', 'border-amber-400', 'border-amber-700', 'border-yellow-400', 'border-yellow-600', 'border-lime-400', 'border-lime-600', 'border-green-500', 'border-green-700', 'border-teal-400', 'border-cyan-400', 'border-cyan-600', 'border-sky-500', 'border-sky-700', 'border-blue-600', 'border-blue-800', 'border-indigo-600', 'border-fuchsia-500', 'border-rose-500'];
+                $textColors = ['text-stone-600', 'text-red-500', 'text-red-700', 'text-orange-500', 'text-orange-700', 'text-amber-400', 'text-amber-700', 'text-yellow-400', 'text-yellow-600', 'text-lime-400', 'text-lime-600', 'text-green-500', 'text-green-700', 'text-teal-400', 'text-cyan-400', 'text-cyan-600', 'text-sky-500', 'text-sky-700', 'text-blue-600', 'text-blue-800', 'text-indigo-600', 'text-fuchsia-500', 'text-rose-500'];
                 foreach ($result->fetch_all(MYSQLI_ASSOC) as $userDetails):
                     ?>
                     <?php $isCurrentUser = ($_SESSION['loginName'] === $userDetails['email']) ?>
@@ -305,7 +308,13 @@ if (!isset($_SESSION['loginName'])) {
                         <div class="w-11 h-11 mt-1.5">
                             <img src="<?= "../server/uploads/images/" . $userDetails['unique_name'] ?>"
                                 alt="<?= $userDetails['name'] ?>"
-                                class="w-full h-full object-cover rounded-full border-2 <?= $borderColors[array_rand($borderColors)] ?>">
+                                class="<?= $userDetails['unique_name'] === null ? 'hidden' : 'inline' ?> w-full h-full object-cover rounded-full border-2 <?= $borderColors[array_rand($borderColors)] ?>">
+                            <svg class="<?= $userDetails['unique_name'] === null ? 'inline' : 'hidden' ?> w-full h-full object-cover <?= $textColors[array_rand($textColors)] ?>" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                    d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
                         </div>
                         <div class="">
                             <h3 class="text-xl font-semibold"><?= $userDetails['name']; ?></h3>
@@ -351,7 +360,7 @@ if (!isset($_SESSION['loginName'])) {
                                         } else {
                                             echo $userDetails['modification_date'] > $userDetails['img_modification_date'] ? date("d F Y, H:i:s", strtotime($userDetails['modification_date'])) : date("d F Y, H:i:s", strtotime($userDetails['img_modification_date']));
                                         }
-                                         ?></dd>
+                                        ?></dd>
                                     </div>
                                 </dl>
                             </div>
