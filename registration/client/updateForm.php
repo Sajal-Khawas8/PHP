@@ -73,9 +73,21 @@
                                 </button>
                                 
                                 <!-- show if user has uploaded image -->
-                                <figure class="<?= empty($_GET['image']) ? 'hidden' : '' ?>">
+                                <figure class="<?= empty($_GET['image']) ? 'hidden' : '' ?>  space-y-4">
                                     <img src="<?= "../server/uploads/images/" . $_GET['image'] ?>" alt="<?= $_GET['imageName']; ?>" class="w-52 h-52 mx-auto">
-                                    <figcaption class="text-lg font-medium text-center"><?= $_GET['imageName']; ?></figcaption>
+                                    <figcaption class="text-lg space-y-3">
+                                        <div class="font-medium text-center"><?= $_GET['imageName']; ?></div>
+                                        <dl class="text-sm flex flex-col items-center">
+                                            <div class="flex gap-2">
+                                                <dt class="font-medium">Picture Uploaded:</dt>
+                                                <dd><?= date("d F Y, H:i:s", strtotime($_GET['imageUploadDate'])) ?></dd>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <dt class="font-medium">Last Changed:</dt>
+                                                <dd><?= date("d F Y, H:i:s", strtotime($_GET['imageChangeDate'])) ?></dd>
+                                            </div>
+                                        </dl>
+                                    </figcaption>
                                 </figure>
 
                                 <!-- show if user hasn't uploaded image -->

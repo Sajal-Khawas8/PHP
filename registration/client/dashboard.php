@@ -350,17 +350,7 @@ if (!isset($_SESSION['loginName'])) {
                                     </div>
                                     <div class="flex gap-2">
                                         <dt class="font-medium">Last Updated:</dt>
-                                        <dd><?php
-                                        if (empty($userDetails['modification_date']) && empty($userDetails['img_modification_date'])) {
-                                            echo "Never";
-                                        } elseif (!empty($userDetails['modification_date']) && empty($userDetails['img_modification_date'])) {
-                                            echo date("d F Y, H:i:s", strtotime($userDetails['modification_date']));
-                                        } elseif (empty($userDetails['modification_date']) && !empty($userDetails['img_modification_date'])) {
-                                            date("d F Y, H:i:s", strtotime($userDetails['img_modification_date']));
-                                        } else {
-                                            echo $userDetails['modification_date'] > $userDetails['img_modification_date'] ? date("d F Y, H:i:s", strtotime($userDetails['modification_date'])) : date("d F Y, H:i:s", strtotime($userDetails['img_modification_date']));
-                                        }
-                                        ?></dd>
+                                        <dd><?= $userDetails['modification_date'] > $userDetails['img_modification_date'] ? date("d F Y, H:i:s", strtotime($userDetails['modification_date'])) : date("d F Y, H:i:s", strtotime($userDetails['img_modification_date'])) ?></dd>
                                     </div>
                                 </dl>
                             </div>
@@ -368,7 +358,7 @@ if (!isset($_SESSION['loginName'])) {
                         <div class="ml-auto h-24 flex flex-col justify-between">
                             <div class="flex items-center gap-12">
                                 <span
-                                    class="<?= $userDetails['active'] ? 'bg-green-400 text-green-700' : 'bg-red-400 text-red-700'; ?> rounded-full px-3 font-medium"><?= $userDetails['active'] ? 'Active' : 'Inactive' ?></span>
+                                    class="<?= $userDetails['locked'] ? 'bg-green-400 text-green-700' : 'bg-red-400 text-red-700'; ?> rounded-full px-3 font-medium"><?= $userDetails['locked'] ? 'Locked' : 'Unlocked' ?></span>
                                 <dl class="flex gap-2">
                                     <dt class="font-medium">ID:</dt>
                                     <dd
@@ -379,21 +369,21 @@ if (!isset($_SESSION['loginName'])) {
                             <div class="flex items-center justify-end gap-12 text-sm text-center">
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
                                     <input type="hidden" name="id" value="<?= $userDetails['id']; ?>">
-                                    <button name="<?= $userDetails['active'] ? 'lockUser' : 'unlockUser'; ?>"
-                                        id="lockUnlockUser">
+                                    <button name="<?= $userDetails['locked'] ? 'unlockUser' : 'lockUser'; ?>"
+                                        id="lockUnlockUser" <?= (!$isCurrentUser) ? 'disabled' : '' ?> class="disabled:text-gray-400">
                                         <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg"
                                             enable-background="new 0 0 24 24" viewBox="0 0 24 24" fill="currentColor">
                                             <rect fill="none" height="24" width="24"></rect>
                                             <path
                                                 d="M13,3c-4.97,0-9,4.03-9,9c0,0.06,0.01,0.12,0.01,0.19l-1.84-1.84l-1.41,1.41L5,16l4.24-4.24l-1.41-1.41l-1.82,1.82 C6.01,12.11,6,12.06,6,12c0-3.86,3.14-7,7-7s7,3.14,7,7s-3.14,7-7,7c-1.9,0-3.62-0.76-4.88-1.99L6.7,18.42 C8.32,20.01,10.55,21,13,21c4.97,0,9-4.03,9-9S17.97,3,13,3z M15,11v-1c0-1.1-0.9-2-2-2s-2,0.9-2,2v1c-0.55,0-1,0.45-1,1v3 c0,0.55,0.45,1,1,1h4c0.55,0,1-0.45,1-1v-3C16,11.45,15.55,11,15,11z M14,11h-2v-1c0-0.55,0.45-1,1-1s1,0.45,1,1V11z">
                                             </path>
-                                            <title><?= $userDetails['active'] ? 'Lock User' : 'Unlock User' ?></title>
+                                            <title><?= $userDetails['locked'] ? 'UnLock Account' : 'Lock Account' ?></title>
                                         </svg>
                                     </button>
                                 </form>
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
                                     <input type="hidden" name="id" value="<?= $userDetails['id']; ?>">
-                                    <button name="editData" <?= (!$userDetails['active'] && !$isCurrentUser) ? 'disabled' : '' ?> class="disabled:text-gray-400">
+                                    <button name="editData" <?= ($userDetails['locked'] && !$isCurrentUser) ? 'disabled' : '' ?> class="disabled:text-gray-400">
                                         <svg class="w-6 h-6 cursor-pointer" height="24" width="24"
                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                             <path
@@ -404,9 +394,9 @@ if (!isset($_SESSION['loginName'])) {
                                     </button>
                                 </form>
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post"
-                                    class=" <?= $isCurrentUser ? "block" : "hidden" ?>">
-                                    <button name="deleteUser" id="deleteUser" <?= $isCurrentUser ? '' : 'disabled' ?>>
-                                        <svg class="w-7 h-7 text-red-600" xmlns="http://www.w3.org/2000/svg"
+                                    class="">
+                                    <button name="deleteUser" id="deleteUser" <?= (!$isCurrentUser) ? 'disabled' : '' ?> class="text-red-600 disabled:text-red-200">
+                                        <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 24 24" fill="currentColor">
                                             <path d="M0 0h24v24H0V0z" fill="none"></path>
                                             <path
