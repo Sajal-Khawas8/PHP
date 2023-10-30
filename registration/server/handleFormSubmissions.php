@@ -115,11 +115,11 @@ if (isset($_POST['deleteUser'])) {
 if (isset($_POST['update'])) {
     $updationErr = [
         'fnameErr' => validateEditedTextData($_POST['name'], $isDataValid),
-        'unameErr' => validateEditedUsername($_POST['username'], $isDataValid),
+        'unameErr' => validateEditedUsername($_POST['username'], $isDataValid, $_POST['id']),
         'genderErr' => '', # There will be no gender error because if user doesn't select gender then it will not be changed
-        'emailErr' => validateEditedEmail($_POST['email'], $isDataValid),
-        'phoneErr' => validateEditedPhoneNumber($_POST['phone'], $isDataValid),
-        'oldPasswordErr' => validateOldPassword($_POST['oldPassword'], $isDataValid),
+        'emailErr' => validateEditedEmail($_POST['email'], $isDataValid, $_POST['id']),
+        'phoneErr' => validateEditedPhoneNumber($_POST['phone'], $isDataValid, $_POST['id']),
+        'oldPasswordErr' => validateOldPassword($_POST['oldPassword'], $isDataValid, $_POST['id']),
         'passwordErr' => validateNewPasswordFormat($_POST['password'], $isDataValid), # New password
         'pictureErr' => validatePictureFormat($_FILES['profilePicture'], $isDataValid)
     ];
