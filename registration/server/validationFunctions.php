@@ -73,7 +73,7 @@ function isInvalidFormat($data, &$msg, $field)
 
 }
 
-function isRedundantData($data, &$msg, $field, $dataType)
+function isRedundantData($data, &$msg, $field, $dataType, $userId = null)
 {
     global $conn;
     $sql = "SELECT id FROM `users` WHERE $dataType = '{$data}'";
@@ -81,17 +81,9 @@ function isRedundantData($data, &$msg, $field, $dataType)
     if (!$result) {
         die("Error searching user: " . $conn->error);
     }
-    if ($result->num_rows > 1) {
+    if ($result->num_rows > 0) {
         $id = $result->fetch_column();
-        $sql = "SELECT id, active FROM `users` WHERE email = '{$_SESSION['loginName']}'";
-        $result = $conn->query($sql);
-        if (!$result) {
-            die("Error searching user: " . $conn->error);
-        }
-        $result = $result->fetch_assoc();
-        $loginId = $result['id'];
-        // $isLocked = $result['active'];
-        if ($id !== $loginId) {
+        if ($id !== $userId) {
             $msg = "*This $field has already been taken";
             return TRUE;
         }
@@ -170,39 +162,39 @@ function validateEditedTextData(&$data, &$isDataValid)
     }
 }
 
-function validateEditedUsername(&$data, &$isDataValid)
+function validateEditedUsername(&$data, &$isDataValid, $id)
 {
     cleanData($data);
     $data = strtolower($data);
     $errMsg = NULL;
-    if (!empty($data) && (isInvalidMinLength($data, $errMsg, 'Username') || isInvalidMaxLength($data, $errMsg, 'Username') || isInvalidFormat($data, $errMsg, 'Username') || isRedundantData($data, $errMsg, 'Username', 'username'))) {
+    if (!empty($data) && (isInvalidMinLength($data, $errMsg, 'Username') || isInvalidMaxLength($data, $errMsg, 'Username') || isInvalidFormat($data, $errMsg, 'Username') || isRedundantData($data, $errMsg, 'Username', 'username', $id))) {
         $isDataValid = false;
         return $errMsg;
     }
 }
 
-function validateEditedEmail(&$data, &$isDataValid)
+function validateEditedEmail(&$data, &$isDataValid, $id)
 {
     cleanData($data);
     $data = strtolower($data);
     $errMsg = NULL;
-    if (!empty($data) && (isInvalidFormat($data, $errMsg, 'Email Address') || isRedundantData($data, $errMsg, 'Email Address', 'email'))) {
+    if (!empty($data) && (isInvalidFormat($data, $errMsg, 'Email Address') || isRedundantData($data, $errMsg, 'Email Address', 'email', $id))) {
         $isDataValid = false;
         return $errMsg;
     }
 }
 
-function validateEditedPhoneNumber(&$data, &$isDataValid)
+function validateEditedPhoneNumber(&$data, &$isDataValid, $id)
 {
     cleanData($data);
     $errMsg = NULL;
-    if (!empty($data) && (isInvalidFormat($data, $errMsg, 'Phone Number') || isRedundantData($data, $errMsg, 'Phone Number', 'phone'))) {
+    if (!empty($data) && (isInvalidFormat($data, $errMsg, 'Phone Number') || isRedundantData($data, $errMsg, 'Phone Number', 'phone', $id))) {
         $isDataValid = false;
         return $errMsg;
     }
 }
 
-function validateOldPassword(&$data, &$isDataValid)
+function validateOldPassword(&$data, &$isDataValid, $id)
 {
     cleanData($data);
     $errMsg = NULL;
@@ -211,7 +203,7 @@ function validateOldPassword(&$data, &$isDataValid)
         return $errMsg;
     }
     global $conn;
-    $sql = "SELECT password FROM `users` WHERE email = '{$_SESSION['loginName']}'";
+    $sql = "SELECT password FROM `users` WHERE id = $id";
     $result = $conn->query($sql);
     if (!$result) {
         die("Error searching user: " . $conn->error);

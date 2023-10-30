@@ -83,7 +83,7 @@ if (!isset($_SESSION['loginName'])) {
                             class="text-red-600 text-sm font-medium"><?= $updationErr['passwordErr'] ?? ''; ?></span>
                     </div>
                 </div>
-
+                <input type="hidden" name="id" value="<?= $_GET['id'] ?? ''; ?>">
                 <button name="update" id="update"
                     class="w-full px-4 py-2 bg-indigo-600 text-white text-lg font-medium rounded-md hover:bg-indigo-800">Update</button>
             </form>

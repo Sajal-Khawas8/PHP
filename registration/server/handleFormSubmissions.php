@@ -93,25 +93,26 @@ if (isset($_POST['deleteUser'])) {
 if (isset($_POST['update'])) {
     $updationErr = [
         'fnameErr' => validateEditedTextData($_POST['name'], $isDataValid),
-        'unameErr' => validateEditedUsername($_POST['username'], $isDataValid),
+        'unameErr' => validateEditedUsername($_POST['username'], $isDataValid, $_POST['id']),
         'genderErr' => '', # There will be no gender error because if user doesn't select gender then it will not be changed
-        'emailErr' => validateEditedEmail($_POST['email'], $isDataValid),
-        'phoneErr' => validateEditedPhoneNumber($_POST['phone'], $isDataValid),
-        'oldPasswordErr' => validateOldPassword($_POST['oldPassword'], $isDataValid),
+        'emailErr' => validateEditedEmail($_POST['email'], $isDataValid, $_POST['id']),
+        'phoneErr' => validateEditedPhoneNumber($_POST['phone'], $isDataValid, $_POST['id']),
+        'oldPasswordErr' => validateOldPassword($_POST['oldPassword'], $isDataValid, $_POST['id']),
         'passwordErr' => validateNewPasswordFormat($_POST['password'], $isDataValid), # New password
     ];
 
     if ($isDataValid) {
-        unset($_POST['oldPassword']);
+        $id=$_POST['id'];
+        unset($_POST['oldPassword'], $_POST['id']);
         $updateStr = '';
         foreach ($_POST as $key => $value) {
             if (!empty($value)) {
                 $updateStr.=$key . " = '" . $value . "', ";
             }
         }
-        $sql = "UPDATE `users` SET $updateStr active = true WHERE email='{$_SESSION['loginName']}'";
+        $sql = "UPDATE `users` SET $updateStr active = true WHERE id=$id";
         if (!$conn->query($sql)) {
-            die("Error searching user $updateStr: " . $conn->error);
+            die("Error searching user: " . $conn->error);
         }
         unset($_SESSION['loginName']);
         header('Location: ../client/login.php');
