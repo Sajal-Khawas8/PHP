@@ -244,7 +244,7 @@ if (!isset($_SESSION['loginName'])) {
     <main class="flex-1 bg-gray-100 overflow-x-hidden overflow-y-auto">
         <header class="flex justify-between items-center text-sm py-2.5 px-6">
             <?php
-            $sql = "SELECT name, unique_name FROM `users` LEFT JOIN `userimg` ON `users`.`id` = `userimg`.`user_id` WHERE email='{$_SESSION['loginName']}'";
+            $sql = "SELECT name, unique_name FROM `users` LEFT JOIN `user_img` ON `users`.`id` = `user_img`.`user_id` WHERE email='{$_SESSION['loginName']}'";
             $result = $conn->query($sql);
             if (!$result) {
                 die("Error searching user: " . $conn->error);
@@ -255,7 +255,7 @@ if (!isset($_SESSION['loginName'])) {
             echo '<h3 class="text-lg font-medium">Welcome, ' . $name . '</h3>';
             ?>
             <div class="<?= $image === null ? 'hidden' : '' ?> w-10 h-10 rounded-full">
-                <img src="<?= "../server/uploads/images/" . $image ?>" alt="<?= $name ?>" class="border-2 border-black rounded-full object-cover">
+                <img src="<?= "../server/uploads/images/" . $image ?>" alt="<?= $name ?>" class="h-full w-full object-cover border-2 border-black rounded-full">
             </div>
             <svg class="<?= $image !== null ? 'hidden' : '' ?> w-10 h-10" height="36" width="36" xmlns="http://www.w3.org/2000/svg" role="img"
                 viewBox="0 0 24 24" aria-labelledby="userIconTitle" fill="none" stroke="currentColor">
@@ -291,7 +291,7 @@ if (!isset($_SESSION['loginName'])) {
 
             <ul class="px-6 space-y-4">
                 <?php
-                $sql = "SELECT * FROM `users` LEFT JOIN `userimg` ON `users`.`id` = `userimg`.`user_id` ORDER BY id";
+                $sql = "SELECT * FROM `users` LEFT JOIN `user_img` ON `users`.`id` = `user_img`.`user_id` ORDER BY id";
                 $result = $conn->query($sql);
                 if (!$result) {
                     die("Error searching users: " . $conn->error);
@@ -337,11 +337,21 @@ if (!isset($_SESSION['loginName'])) {
                                     </div>
                                     <div class="flex gap-2">
                                         <dt class="font-medium">Account Created:</dt>
-                                        <dd>2023-10-29 20:15:50</dd>
+                                        <dd><?= date("d F Y, H:i:s", strtotime($userDetails['creation_date'])) ?></dd>
                                     </div>
                                     <div class="flex gap-2">
                                         <dt class="font-medium">Last Updated:</dt>
-                                        <dd>2023-10-29 20:15:50</dd>
+                                        <dd><?php
+                                        if (empty($userDetails['modification_date']) && empty($userDetails['img_modification_date'])) {
+                                            echo "Never";
+                                        } elseif (!empty($userDetails['modification_date']) && empty($userDetails['img_modification_date'])) {
+                                            echo date("d F Y, H:i:s", strtotime($userDetails['modification_date']));
+                                        } elseif (empty($userDetails['modification_date']) && !empty($userDetails['img_modification_date'])) {
+                                            date("d F Y, H:i:s", strtotime($userDetails['img_modification_date']));
+                                        } else {
+                                            echo $userDetails['modification_date'] > $userDetails['img_modification_date'] ? date("d F Y, H:i:s", strtotime($userDetails['modification_date'])) : date("d F Y, H:i:s", strtotime($userDetails['img_modification_date']));
+                                        }
+                                         ?></dd>
                                     </div>
                                 </dl>
                             </div>

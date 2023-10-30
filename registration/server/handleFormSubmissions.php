@@ -21,7 +21,8 @@ if (isset($_POST['register'])) {
 
     if ($isDataValid) {
         unset($_POST['confirmPassword'], $_POST['register']);
-        $sql = "INSERT INTO `users` (`name`, `username`, `gender`, `email`, `phone`, `password`) VALUES ('{$_POST['fname']}', '{$_POST['uname']}', '{$_POST['gender']}', '{$_POST['email']}', '{$_POST['phone']}', '{$_POST['password']}')";
+        $date=date("Y-m-d H:i:s");
+        $sql = "INSERT INTO `users` (`name`, `username`, `gender`, `email`, `phone`, `password`, `creation_date`) VALUES ('{$_POST['fname']}', '{$_POST['uname']}', '{$_POST['gender']}', '{$_POST['email']}', '{$_POST['phone']}', '{$_POST['password']}', '{$date}')";
         if (!$conn->query($sql)) {
             die("Error creating user: " . $conn->error);
         }
@@ -39,8 +40,7 @@ if (isset($_POST['register'])) {
                 die("Error searching userID: " . $conn->error);
             }
             $userID = $userID->fetch_column();
-            $date = date("Y-m-d H:i:s");
-            $sql = "INSERT INTO `userImg` (`user_id`, `display_name`, `unique_name`, `creation_date`) VALUES ('{$userID}', '{$fileName}', '{$newFileName}', '{$date}')";
+            $sql = "INSERT INTO `user_img` (`user_id`, `display_name`, `unique_name`, `upload_date`) VALUES ('{$userID}', '{$fileName}', '{$newFileName}', '{$date}')";
             if (!$conn->query($sql)) {
                 die("Error uploading profile picture: " . $conn->error);
             }
@@ -90,7 +90,7 @@ if (isset($_POST['unlockUser'])) {
 
 //Handle Edit Button
 if (isset($_POST['editData'])) {
-    $sql = "SELECT * FROM `users` LEFT JOIN `userimg` ON `users`.`id` = `userimg`.`user_id` WHERE id='{$_POST['id']}'";
+    $sql = "SELECT * FROM `users` LEFT JOIN `user_img` ON `users`.`id` = `user_img`.`user_id` WHERE id='{$_POST['id']}'";
     $result = $conn->query($sql);
     if (!$result) {
         die("Error editing user: " . $conn->error);
@@ -127,13 +127,14 @@ if (isset($_POST['update'])) {
     if ($isDataValid) {
         $id=$_POST['id'];
         unset($_POST['oldPassword'], $_POST['id']);
+        $date=date("Y-m-d H:i:s");
         $updateStr = '';
         foreach ($_POST as $key => $value) {
             if (!empty($value)) {
                 $updateStr .= $key . " = '" . $value . "', ";
             }
         }
-        $sql = "UPDATE `users` SET $updateStr active = true WHERE id='{$id}'";
+        $sql = "UPDATE `users` SET $updateStr active = true, modification_date = '{$date}' WHERE id='{$id}'";
         if (!$conn->query($sql)) {
             die("Error searching user $updateStr: " . $conn->error);
         }
@@ -141,22 +142,21 @@ if (isset($_POST['update'])) {
             $fileExtension = strtolower(pathinfo($_FILES['profilePicture']['name'])['extension']);
             $fileName = pathinfo($_FILES['profilePicture']['name'])['filename'] . "." . $fileExtension;
             $newFileName = uniqid() . "." . $fileExtension;
-            $date=date("Y-m-d H:i:s");
             if (!move_uploaded_file($_FILES['profilePicture']['tmp_name'], "../server/uploads/images/{$newFileName}")) {
                 die("Error uploading file");
             }
-            $sql="SELECT * FROM `userImg` WHERE user_id = '{$id}'";
+            $sql="SELECT * FROM `user_img` WHERE user_id = '{$id}'";
             $result=$conn->query($sql);
             if (!$result) {
                 die("Error searching user image");
             }
             if ($result->num_rows > 0) {
-                $sql = "UPDATE `userImg` SET display_name = '{$fileName}', unique_name = '{$newFileName}', modified_date = '{$date}' WHERE `user_id` = '{$id}'";
+                $sql = "UPDATE `user_img` SET display_name = '{$fileName}', unique_name = '{$newFileName}', img_modification_date = '{$date}' WHERE `user_id` = '{$id}'";
                 if (!$conn->query($sql)) {
                     die("Error updating profile picture: " . $conn->error);
                 }
             } else {
-                $sql = "INSERT INTO `userImg` (`user_id`, `display_name`, `unique_name`, `creation_date`) VALUES ('{$id}', '{$fileName}', '{$newFileName}', '{$date}')";
+                $sql = "INSERT INTO `user_img` (`user_id`, `display_name`, `unique_name`, `upload_date`) VALUES ('{$id}', '{$fileName}', '{$newFileName}', '{$date}')";
                 if (!$conn->query($sql)) {
                     die("Error updating profile picture: " . $conn->error);
                 }
