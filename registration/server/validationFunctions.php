@@ -81,24 +81,20 @@ function isRedundantData($data, &$msg, $field, $dataType)
     if (!$result) {
         die("Error searching user: " . $conn->error);
     }
-    if ($result->num_rows > 0) {
-        if (isset($_SESSION['loginName'])) {
-            $id = $result->fetch_column();
-            $sql = "SELECT id FROM `users` WHERE email = '{$_SESSION['loginName']}'";
-            $result = $conn->query($sql);
-            if (!$result) {
-                die("Error searching user: " . $conn->error);
-            }
-            $loginId = $result->fetch_column();
-            if ($id !== $loginId) {
-                $msg = "*This $field has already been taken";
-                return TRUE;
-            }
-        } else {
+    if ($result->num_rows > 1) {
+        $id = $result->fetch_column();
+        $sql = "SELECT id, active FROM `users` WHERE email = '{$_SESSION['loginName']}'";
+        $result = $conn->query($sql);
+        if (!$result) {
+            die("Error searching user: " . $conn->error);
+        }
+        $result = $result->fetch_assoc();
+        $loginId = $result['id'];
+        // $isLocked = $result['active'];
+        if ($id !== $loginId) {
             $msg = "*This $field has already been taken";
             return TRUE;
         }
-
     }
 }
 

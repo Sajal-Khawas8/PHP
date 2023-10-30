@@ -1,4 +1,10 @@
-<?php require("../server/handleFormSubmissions.php") ?>
+<?php 
+require("../server/handleFormSubmissions.php");
+if (!isset($_SESSION['loginName'])) {
+    header("Location: ./login.php");
+    exit;
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
