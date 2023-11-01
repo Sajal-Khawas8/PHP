@@ -252,20 +252,19 @@ if (!isset($_SESSION['loginName'])) {
             $result = $result->fetch_assoc();
             $name = $result['name'];
             $image = $result['unique_name'];
-            echo '<h3 class="text-lg font-medium">Welcome, ' . $name . '</h3>';
+            $svgBgColors = ['text-stone-600', 'text-red-500', 'text-red-700', 'text-orange-500', 'text-orange-700', 'text-amber-400', 'text-amber-700', 'text-yellow-400', 'text-yellow-600', 'text-lime-400', 'text-lime-600', 'text-green-500', 'text-green-700', 'text-teal-400', 'text-cyan-400', 'text-cyan-600', 'text-sky-500', 'text-sky-700', 'text-blue-600', 'text-blue-800', 'text-indigo-600', 'text-fuchsia-500', 'text-rose-500'];
             ?>
+            <h3 class="text-lg font-medium">Welcome, <?= $name; ?> </h3>
             <div class="<?= $image === null ? 'hidden' : '' ?> w-10 h-10 rounded-full">
                 <img src="<?= "../server/uploads/images/" . $image ?>" alt="<?= $name ?>"
-                    class="h-full w-full object-cover border-2 border-black rounded-full">
+                    class="h-full w-full object-cover border-2 border-gray-500 rounded-full">
             </div>
-            <svg class="<?= $image !== null ? 'hidden' : '' ?> w-10 h-10" height="36" width="36"
-                xmlns="http://www.w3.org/2000/svg" role="img" viewBox="0 0 24 24" aria-labelledby="userIconTitle"
-                fill="none" stroke="currentColor">
-                <title id="userIconTitle">User</title>
-                <circle cx="12" cy="12" r="10" fill="#ffa000db"></circle>
-                <path stroke-linecap="round" fill="#000"
-                    d="M5.5,19.5 C7.83333333,18.5 9.33333333,17.6666667 10,17 C11,16 8,16 8,11 C8,7.66666667 9.33333333,6 12,6 C14.6666667,6 16,7.66666667 16,11 C16,16 13,16 14,17 C14.6666667,17.6666667 16.1666667,18.5 18.5,19.5">
-                </path>
+            <svg class="<?= $image !== null ? 'hidden' : '' ?> w-10 h-10 <?= $svgBgColors[array_rand($svgBgColors)] ?>"
+                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd"
+                    d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+                    clip-rule="evenodd"></path>
+                    <title id="userIconTitle">User</title>
             </svg>
         </header>
 
@@ -298,8 +297,6 @@ if (!isset($_SESSION['loginName'])) {
                 if (!$result) {
                     die("Error searching users: " . $conn->error);
                 }
-                $borderColors = ['border-stone-600', 'border-red-500', 'border-red-700', 'border-orange-500', 'border-orange-700', 'border-amber-400', 'border-amber-700', 'border-yellow-400', 'border-yellow-600', 'border-lime-400', 'border-lime-600', 'border-green-500', 'border-green-700', 'border-teal-400', 'border-cyan-400', 'border-cyan-600', 'border-sky-500', 'border-sky-700', 'border-blue-600', 'border-blue-800', 'border-indigo-600', 'border-fuchsia-500', 'border-rose-500'];
-                $textColors = ['text-stone-600', 'text-red-500', 'text-red-700', 'text-orange-500', 'text-orange-700', 'text-amber-400', 'text-amber-700', 'text-yellow-400', 'text-yellow-600', 'text-lime-400', 'text-lime-600', 'text-green-500', 'text-green-700', 'text-teal-400', 'text-cyan-400', 'text-cyan-600', 'text-sky-500', 'text-sky-700', 'text-blue-600', 'text-blue-800', 'text-indigo-600', 'text-fuchsia-500', 'text-rose-500'];
                 foreach ($result->fetch_all(MYSQLI_ASSOC) as $userDetails):
                     ?>
                     <?php $isCurrentUser = ($_SESSION['loginName'] === $userDetails['email']) ?>
@@ -308,9 +305,10 @@ if (!isset($_SESSION['loginName'])) {
                         <div class="w-11 h-11 mt-1.5">
                             <img src="<?= "../server/uploads/images/" . $userDetails['unique_name'] ?>"
                                 alt="<?= $userDetails['name'] ?>"
-                                class="<?= $userDetails['unique_name'] === null ? 'hidden' : 'inline' ?> w-full h-full object-cover rounded-full border-2 <?= $borderColors[array_rand($borderColors)] ?>">
-                            <svg class="<?= $userDetails['unique_name'] === null ? 'inline' : 'hidden' ?> w-full h-full object-cover <?= $textColors[array_rand($textColors)] ?>" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                fill="currentColor" aria-hidden="true">
+                                class="<?= $userDetails['unique_name'] === null ? 'hidden' : 'inline' ?> w-full h-full object-cover rounded-full border-2 border-gray-500">
+                            <svg class="<?= $userDetails['unique_name'] === null ? 'inline' : 'hidden' ?> w-full h-full object-cover <?= $svgBgColors[array_rand($svgBgColors)] ?>"
+                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                aria-hidden="true">
                                 <path fill-rule="evenodd"
                                     d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
                                     clip-rule="evenodd"></path>
@@ -318,7 +316,7 @@ if (!isset($_SESSION['loginName'])) {
                         </div>
                         <div class="">
                             <h3 class="text-xl font-semibold"><?= $userDetails['name']; ?></h3>
-                            <div class="flex gap-12 items-end">
+                            <div class="grid grid-cols-2 items-end">
                                 <div>
                                     <p class="text-lg font-medium"><?= $userDetails['username']; ?></p>
                                     <dl>
@@ -350,7 +348,8 @@ if (!isset($_SESSION['loginName'])) {
                                     </div>
                                     <div class="flex gap-2">
                                         <dt class="font-medium">Last Updated:</dt>
-                                        <dd><?= $userDetails['modification_date'] > $userDetails['img_modification_date'] ? date("d F Y, H:i:s", strtotime($userDetails['modification_date'])) : date("d F Y, H:i:s", strtotime($userDetails['img_modification_date'])) ?></dd>
+                                        <dd><?= $userDetails['modification_date'] > $userDetails['img_modification_date'] ? date("d F Y, H:i:s", strtotime($userDetails['modification_date'])) : date("d F Y, H:i:s", strtotime($userDetails['img_modification_date'])) ?>
+                                        </dd>
                                     </div>
                                 </dl>
                             </div>
@@ -370,7 +369,8 @@ if (!isset($_SESSION['loginName'])) {
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
                                     <input type="hidden" name="id" value="<?= $userDetails['id']; ?>">
                                     <button name="<?= $userDetails['locked'] ? 'unlockUser' : 'lockUser'; ?>"
-                                        id="lockUnlockUser" <?= (!$isCurrentUser) ? 'disabled' : '' ?> class="disabled:text-gray-400">
+                                        id="lockUnlockUser" <?= (!$isCurrentUser) ? 'disabled' : '' ?>
+                                        class="disabled:text-gray-400">
                                         <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg"
                                             enable-background="new 0 0 24 24" viewBox="0 0 24 24" fill="currentColor">
                                             <rect fill="none" height="24" width="24"></rect>
@@ -384,7 +384,7 @@ if (!isset($_SESSION['loginName'])) {
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
                                     <input type="hidden" name="id" value="<?= $userDetails['id']; ?>">
                                     <button name="editData" <?= ($userDetails['locked'] && !$isCurrentUser) ? 'disabled' : '' ?> class="disabled:text-gray-400">
-                                        <svg class="w-6 h-6 cursor-pointer" height="24" width="24"
+                                        <svg class="w-6 h-6" height="24" width="24"
                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                                             <path
                                                 d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
@@ -393,11 +393,11 @@ if (!isset($_SESSION['loginName'])) {
                                         </svg>
                                     </button>
                                 </form>
-                                <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post"
-                                    class="">
-                                    <button name="deleteUser" id="deleteUser" <?= (!$isCurrentUser) ? 'disabled' : '' ?> class="text-red-600 disabled:text-red-200">
-                                        <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 24 24" fill="currentColor">
+                                <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" class="">
+                                    <button name="deleteUser" id="deleteUser" <?= (!$isCurrentUser) ? 'disabled' : '' ?>
+                                        class="text-red-600 disabled:text-red-200">
+                                        <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                            fill="currentColor">
                                             <path d="M0 0h24v24H0V0z" fill="none"></path>
                                             <path
                                                 d="M6 21h12V7H6v14zm2.46-9.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4h-3.5z">

@@ -242,9 +242,9 @@ function validateCnfrmPassword($cnfrmPassword, $password, &$isDataValid)
     }
 }
 
-function validatePictureFormat($uploadedFile, $isDataValid)
+function validatePictureFormat($uploadedFile, &$isDataValid)
 {
-    if (!empty($uploadedFile['name']) && (!in_array(strtolower(pathinfo($uploadedFile['name'])['extension']), ['jpg', 'png']))) {
+    if (!empty($uploadedFile['name']) && (!in_array(strtolower(pathinfo($uploadedFile['name'])['extension']), ['jpg', 'jpeg', 'png']))) {
         $isDataValid = false;
         return "*Please select jpg or png file";
     }
