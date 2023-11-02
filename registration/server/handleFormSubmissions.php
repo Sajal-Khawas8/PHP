@@ -90,7 +90,7 @@ if (isset($_POST['unlockUser'])) {
 
 //Handle Edit Button
 if (isset($_POST['editData'])) {
-    $sql = "SELECT * FROM `users` LEFT JOIN `user_img` ON `users`.`id` = `user_img`.`user_id` WHERE email='{$_SESSION['loginName']}'";
+    $sql = "SELECT * FROM `users` LEFT JOIN `user_img` ON `users`.`id` = `user_img`.`user_id` WHERE id={$_POST['id']}";
     $result = $conn->query($sql);
     if (!$result) {
         die("Error editing user: " . $conn->error);
