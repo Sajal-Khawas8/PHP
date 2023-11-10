@@ -80,11 +80,23 @@
                                         <dl class="text-sm flex flex-col items-center">
                                             <div class="flex gap-2">
                                                 <dt class="font-medium">Picture Uploaded:</dt>
-                                                <dd><?= date("d F Y, H:i:s", strtotime($_GET['imageUploadDate'])) ?></dd>
+                                                <dd><?php
+                                                    date_default_timezone_set('UTC');
+                                                    $date = strtotime($_GET['imageUploadDate']);
+                                                    date_default_timezone_set('Asia/Kolkata');
+                                                    echo date("d F Y, H:i:s", $date);
+                                                    ?>
+                                                </dd>
                                             </div>
                                             <div class="flex gap-2">
                                                 <dt class="font-medium">Last Changed:</dt>
-                                                <dd><?= date("d F Y, H:i:s", strtotime($_GET['imageChangeDate'])) ?></dd>
+                                                <dd>
+                                                    <?php
+                                                    date_default_timezone_set('UTC');
+                                                    $date = strtotime($_GET['imageChangeDate']);
+                                                    date_default_timezone_set('Asia/Kolkata');
+                                                    echo date("d F Y, H:i:s", $date);
+                                                    ?>    
                                             </div>
                                         </dl>
                                     </figcaption>

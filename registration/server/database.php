@@ -55,7 +55,6 @@ class DatabaseQuery implements CRUD
     use Connection;
     public function add($table, $data)
     {
-        date_default_timezone_set('Asia/Kolkata');
         $date = date("Y-m-d H:i:s");
         $columns = implode(', ', array_keys($data));
         $values = implode("', '", array_values($data));
@@ -66,7 +65,6 @@ class DatabaseQuery implements CRUD
     }
     public function update($table, $updateStr, $searchId, $searchCriteria='id')
     {
-        date_default_timezone_set('Asia/Kolkata');
         $date = date("Y-m-d H:i:s");
         $sql = "UPDATE $table SET $updateStr, modification_date = '$date' WHERE $searchCriteria='$searchId'";
         if (!$this->conn->query($sql)) {
