@@ -17,12 +17,12 @@
             <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" enctype="multipart/form-data" class="space-y-7 py-5">
                 <div class="grid grid-cols-2 gap-6">
                     <div class="relative">
-                        <input type="text" name="fname" id="fname" placeholder="Full Name"
+                        <input type="text" name="name" id="name" placeholder="Full Name"
                             class="w-full px-4 py-2 border border-gray-600 rounded outline-indigo-600 placeholder:text-gray-500">
                         <span class="text-red-600 text-sm font-medium"><?= $registrationErr['fnameErr'] ?? ''; ?></span>
                     </div>
                     <div class="relative">
-                        <input type="text" name="uname" id="uname" placeholder="Username"
+                        <input type="text" name="username" id="username" placeholder="Username"
                             class="w-full px-4 py-2 border border-gray-600 rounded outline-indigo-600 placeholder:text-gray-500">
                         <span class="text-red-600 text-sm font-medium"><?= $registrationErr['unameErr'] ?? ''; ?></span>
                     </div>

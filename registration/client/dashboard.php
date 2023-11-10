@@ -244,12 +244,13 @@ if (!isset($_SESSION['loginName'])) {
     <main class="flex-1 bg-gray-100 overflow-x-hidden overflow-y-auto">
         <header class="flex justify-between items-center text-sm py-2.5 px-6">
             <?php
-            $sql = "SELECT name, unique_name FROM `users` LEFT JOIN `user_img` ON `users`.`id` = `user_img`.`user_id` WHERE email='{$_SESSION['loginName']}'";
-            $result = $conn->query($sql);
-            if (!$result) {
-                die("Error searching user: " . $conn->error);
-            }
-            $result = $result->fetch_assoc();
+            // $sql = "SELECT name, unique_name FROM `users` LEFT JOIN `user_img` ON `users`.`id` = `user_img`.`user_id` WHERE email='{$_SESSION['loginName']}'";
+            // $result = $conn->query($sql);
+            // if (!$result) {
+            //     die("Error searching user: " . $conn->error);
+            // }
+            $query = new DatabaseQuery();
+            $result = $query->selectUserJoin('users', 'id', 'user_img', 'user_id', 'name, unique_name', $_SESSION['loginName'], 'email');
             $name = $result['name'];
             $image = $result['unique_name'];
             $svgBgColors = ['text-stone-600', 'text-red-500', 'text-red-700', 'text-orange-500', 'text-orange-700', 'text-amber-400', 'text-amber-700', 'text-yellow-400', 'text-yellow-600', 'text-lime-400', 'text-lime-600', 'text-green-500', 'text-green-700', 'text-teal-400', 'text-cyan-400', 'text-cyan-600', 'text-sky-500', 'text-sky-700', 'text-blue-600', 'text-blue-800', 'text-indigo-600', 'text-fuchsia-500', 'text-rose-500'];
@@ -264,7 +265,7 @@ if (!isset($_SESSION['loginName'])) {
                 <path fill-rule="evenodd"
                     d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
                     clip-rule="evenodd"></path>
-                    <title id="userIconTitle">User</title>
+                <title id="userIconTitle">User</title>
             </svg>
         </header>
 
@@ -292,12 +293,9 @@ if (!isset($_SESSION['loginName'])) {
 
             <ul class="px-6 space-y-4">
                 <?php
-                $sql = "SELECT * FROM `users` LEFT JOIN `user_img` ON `users`.`id` = `user_img`.`user_id` ORDER BY id";
-                $result = $conn->query($sql);
-                if (!$result) {
-                    die("Error searching users: " . $conn->error);
-                }
-                foreach ($result->fetch_all(MYSQLI_ASSOC) as $userDetails):
+                $query = new DatabaseQuery();
+                $users = $query->selectAllUsersJoin('users', 'id', 'user_img', 'user_id');
+                foreach ($users as $userDetails):
                     ?>
                     <?php $isCurrentUser = ($_SESSION['loginName'] === $userDetails['email']) ?>
                     <li
@@ -348,7 +346,7 @@ if (!isset($_SESSION['loginName'])) {
                                     </div>
                                     <div class="flex gap-2">
                                         <dt class="font-medium">Last Updated:</dt>
-                                        <dd><?= $userDetails['modification_date'] > $userDetails['img_modification_date'] ? date("d F Y, H:i:s", strtotime($userDetails['modification_date'])) : date("d F Y, H:i:s", strtotime($userDetails['img_modification_date'])) ?>
+                                        <dd><?= $userDetails['users_modification_date'] > $userDetails['user_img_modification_date'] ? date("d F Y, H:i:s", strtotime($userDetails['users_modification_date'])) : date("d F Y, H:i:s", strtotime($userDetails['user_img_modification_date'])) ?>
                                         </dd>
                                     </div>
                                 </dl>
@@ -384,8 +382,8 @@ if (!isset($_SESSION['loginName'])) {
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
                                     <input type="hidden" name="id" value="<?= $userDetails['id']; ?>">
                                     <button name="editData" <?= ($userDetails['locked'] && !$isCurrentUser) ? 'disabled' : '' ?> class="disabled:text-gray-400">
-                                        <svg class="w-6 h-6" height="24" width="24"
-                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <svg class="w-6 h-6" height="24" width="24" xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 24 24" fill="currentColor">
                                             <path
                                                 d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
                                             </path>

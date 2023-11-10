@@ -1,65 +1,19 @@
 <?php
 session_start();
-$isDataValid = true;
 $loginNameErr = $loginPasswordErr = '';
-require "../server/dbConnection.php";
-require "../server/validationFunctions.php";
-date_default_timezone_set('Asia/Kolkata');
+require "../server/bootstrap.php";
 
 // Handle Registration Form
 if (isset($_POST['register'])) {
-    $registrationErr = [
-        'fnameErr' => validateTextData($_POST['fname'], $isDataValid),
-        'unameErr' => validateUsername($_POST['uname'], $isDataValid),
-        'genderErr' => validateGender($_POST['gender'] ?? null, $isDataValid),
-        'emailErr' => validateEmail($_POST['email'], $isDataValid),
-        'phoneErr' => validatePhoneNumber($_POST['phone'], $isDataValid),
-        'passwordErr' => validatePasswordFormat($_POST['password'], $isDataValid),
-        'cnfrmPasswordErr' => validateCnfrmPassword($_POST['confirmPassword'], $_POST['password'], $isDataValid),
-        'pictureErr' => validatePictureFormat($_FILES['profilePicture'], $isDataValid)
-    ];
-
-    if ($isDataValid) {
-        unset($_POST['confirmPassword'], $_POST['register']);
-        $date=date("Y-m-d H:i:s");
-        $sql = "INSERT INTO `users` (`name`, `username`, `gender`, `email`, `phone`, `password`, `creation_date`, `modification_date`) VALUES ('{$_POST['fname']}', '{$_POST['uname']}', '{$_POST['gender']}', '{$_POST['email']}', '{$_POST['phone']}', '{$_POST['password']}', '{$date}', '{$date}')";
-        if (!$conn->query($sql)) {
-            die("Error creating user: " . $conn->error);
-        }
-        if (!empty($_FILES['profilePicture']['name'])) {
-            # code...
-            $fileExtension = strtolower(pathinfo($_FILES['profilePicture']['name'])['extension']);
-            $fileName = pathinfo($_FILES['profilePicture']['name'])['filename'] . "." . $fileExtension;
-            $newFileName = uniqid() . "." . $fileExtension;
-            if (!move_uploaded_file($_FILES['profilePicture']['tmp_name'], "../server/uploads/images/{$newFileName}")) {
-                die("Error uploading file");
-            }
-            $sql = "SELECT id FROM `users` WHERE email = '{$_POST['email']}'";
-            $userID = $conn->query($sql);
-            if (!$userID) {
-                die("Error searching userID: " . $conn->error);
-            }
-            $userID = $userID->fetch_column();
-            $sql = "INSERT INTO `user_img` (`user_id`, `display_name`, `unique_name`, `upload_date`, `img_modification_date`) VALUES ('{$userID}', '{$fileName}', '{$newFileName}', '{$date}', '{$date}')";
-            if (!$conn->query($sql)) {
-                die("Error uploading profile picture: " . $conn->error);
-            }
-        }
-        header('Location: ../client/login.php');
-        exit;
-    }
-
+    $user=new User();
+    $registrationErr=$user->addUser($_POST);
 }
 
 // Handle Login Form
 if (isset($_POST['login'])) {
-    if (validateLoginData($_POST['loginName'], $_POST['loginPassword'], $loginNameErr, $loginPasswordErr)) {
-        $sql = "SELECT email FROM `users` WHERE email = '{$_POST['loginName']}' OR username = '{$_POST['loginName']}' OR phone = '{$_POST['loginName']}'";
-        $result = $conn->query($sql);
-        if (!$result) {
-            die("Error in login: " . $conn->error);
-        }
-        $_SESSION['loginName'] = $result->fetch_column();
+    $validate = new ValidateData();
+    if ($validate->validateLoginDataAndSearchUser($_POST['loginName'], $loginNameErr, $_POST['loginPassword'], $loginPasswordErr)) {
+        $_SESSION['loginName'] = $_POST['loginName'];
         header("Location: ../client/dashboard.php");
         exit;
     }
@@ -74,113 +28,44 @@ if (isset($_POST['logout'])) {
 
 //Handle Lock Button
 if (isset($_POST['lockUser'])) {
-    $sql = "UPDATE `users` SET locked = true WHERE email='{$_SESSION['loginName']}'";
-    if (!$conn->query($sql)) {
-        die("Error locking user: " . $conn->error);
-    }
+    $query = new DatabaseQuery();
+    $query->update('users', 'locked=true', $_SESSION['loginName'], 'email');
 }
 
 //Handle Unlock Button
 if (isset($_POST['unlockUser'])) {
-    $sql = "UPDATE `users` SET locked = false WHERE email='{$_SESSION['loginName']}'";
-    if (!$conn->query($sql)) {
-        die("Error unlocking user: " . $conn->error);
-    }
+    $query = new DatabaseQuery();
+    $query->update('users', 'locked=false', $_SESSION['loginName'], 'email');
 }
 
 //Handle Edit Button
 if (isset($_POST['editData'])) {
-    $sql = "SELECT * FROM `users` LEFT JOIN `user_img` ON `users`.`id` = `user_img`.`user_id` WHERE id={$_POST['id']}";
-    $result = $conn->query($sql);
-    if (!$result) {
-        die("Error editing user: " . $conn->error);
-    }
-    $data = $result->fetch_array(MYSQLI_ASSOC);
-    header("Location: ../client/updateForm.php?id={$data['id']}&name={$data['name']}&uname={$data['username']}&gender={$data['gender']}&email={$data['email']}&phone={$data['phone']}&imageName={$data['display_name']}&image={$data['unique_name']}&imageUploadDate={$data['upload_date']}&imageChangeDate={$data['img_modification_date']}");
+    $query = new DatabaseQuery();
+    $data = $query->selectUserJoin('users', 'id', 'user_img', 'user_id', '*', $_POST['id']);
+    header("Location: ../client/updateForm.php?id={$data['id']}&name={$data['name']}&uname={$data['username']}&gender={$data['gender']}&email={$data['email']}&phone={$data['phone']}&imageName={$data['display_name']}&image={$data['unique_name']}&imageUploadDate={$data['user_img_creation_date']}&imageChangeDate={$data['user_img_modification_date']}");
     exit;
 }
 
 //Handle Delete Button
 if (isset($_POST['deleteUser'])) {
-    $sql = "DELETE FROM `users` WHERE email='{$_SESSION['loginName']}'";
-    if (!$conn->query($sql)) {
-        die("Error deleting user: " . $conn->error);
-    }
-    unset($_SESSION['loginName']);
-    header("Location: ../client/index.php");
-    exit;
+    $user=new User();
+    $user->removeUser();
 }
 
 // Handle Update Form
 if (isset($_POST['update'])) {
-    $updationErr = [
-        'fnameErr' => validateEditedTextData($_POST['name'], $isDataValid),
-        'unameErr' => validateEditedUsername($_POST['username'], $isDataValid, $_POST['id']),
-        'genderErr' => '', # There will be no gender error because if user doesn't select gender then it will not be changed
-        'emailErr' => validateEditedEmail($_POST['email'], $isDataValid, $_POST['id']),
-        'phoneErr' => validateEditedPhoneNumber($_POST['phone'], $isDataValid, $_POST['id']),
-        'oldPasswordErr' => validateOldPassword($_POST['oldPassword'], $isDataValid, $_POST['id']),
-        'passwordErr' => validateNewPasswordFormat($_POST['password'], $isDataValid), # New password
-        'pictureErr' => validatePictureFormat($_FILES['profilePicture'], $isDataValid)
-    ];
-
-    if ($isDataValid) {
-        $id=$_POST['id'];
-        unset($_POST['oldPassword'], $_POST['id']);
-        $date=date("Y-m-d H:i:s");
-        $updateStr = '';
-        foreach ($_POST as $key => $value) {
-            if (!empty($value)) {
-                $updateStr .= $key . " = '" . $value . "', ";
-            }
-        }
-        $sql = "UPDATE `users` SET $updateStr locked = true, modification_date = '{$date}' WHERE id='{$id}'";
-        if (!$conn->query($sql)) {
-            die("Error searching user $updateStr: " . $conn->error);
-        }
-        if (!empty($_FILES['profilePicture']['name'])) {
-            $fileExtension = strtolower(pathinfo($_FILES['profilePicture']['name'])['extension']);
-            $fileName = pathinfo($_FILES['profilePicture']['name'])['filename'] . "." . $fileExtension;
-            $newFileName = uniqid() . "." . $fileExtension;
-            if (!move_uploaded_file($_FILES['profilePicture']['tmp_name'], "../server/uploads/images/{$newFileName}")) {
-                die("Error uploading file");
-            }
-            $sql="SELECT * FROM `user_img` WHERE user_id = '{$id}'";
-            $result=$conn->query($sql);
-            if (!$result) {
-                die("Error searching user image");
-            }
-            if ($result->num_rows > 0) {
-                $sql = "UPDATE `user_img` SET display_name = '{$fileName}', unique_name = '{$newFileName}', img_modification_date = '{$date}' WHERE `user_id` = '{$id}'";
-                if (!$conn->query($sql)) {
-                    die("Error updating profile picture: " . $conn->error);
-                }
-            } else {
-                $sql = "INSERT INTO `user_img` (`user_id`, `display_name`, `unique_name`, `upload_date`, `img_modification_date`) VALUES ('{$id}', '{$fileName}', '{$newFileName}', '{$date}', '{$date}')";
-                if (!$conn->query($sql)) {
-                    die("Error updating profile picture: " . $conn->error);
-                }
-            }
-        }
-        unset($_SESSION['loginName']);
-        header('Location: ../client/login.php');
-        exit;
-    }
-
+    $user=new User();
+    $updationErr = $user->updateUser($_POST);
 }
 
 // Handle Search Bar
 if (isset($_POST['searchUser'])) {
     $isSearchErr = false;
-    cleanData($_POST['searchData']);
-    if (isEmpty($_POST['searchData'], $searchErr, 'Username / Email Address or Phone Number')) {
-        $isSearchErr = true;
-    } else {
-        $searchEmail = searchUser($_POST['searchData']);
-        if (stristr($searchEmail, "Invalid")) {
-            $isSearchErr = true;
-            $searchErr = $searchEmail;
-        }
+    $searchErr;
+    $validate=new ValidateData();
+    $searchEmail = $validate->validateLoginDataAndSearchUser($_POST['searchData'], $searchErr);
+    if ($searchErr !== null) {
+        $isSearchErr=true;
     }
 }
 ?>
