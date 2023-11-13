@@ -344,10 +344,8 @@ if (!isset($_SESSION['loginName'])) {
                                         <dt class="font-medium">Account Created:</dt>
                                         <dd>
                                             <?php
-                                            date_default_timezone_set('UTC');
-                                            $date = strtotime($userDetails['creation_date']);
-                                            date_default_timezone_set('Asia/Kolkata');
-                                            echo date("d F Y, H:i:s", $date);
+                                            $date = new DateTime($userDetails['creation_date'], new DateTimeZone('UTC'));
+                                            echo $date->setTimezone(new DateTimeZone('+0530'))->format('d F y, H:i:s');
                                             ?>
                                         </dd>
                                     </div>
@@ -356,15 +354,11 @@ if (!isset($_SESSION['loginName'])) {
                                         <dd>
                                             <?php
                                             if ($userDetails['users_modification_date'] > $userDetails['user_img_modification_date']) {
-                                                date_default_timezone_set('UTC');
-                                                $date = strtotime($userDetails['users_modification_date']);
-                                                date_default_timezone_set('Asia/Kolkata');
-                                                echo date("d F Y, H:i:s", $date);
+                                                $date = new DateTime($userDetails['users_modification_date'], new DateTimeZone('UTC'));
+                                                echo $date->setTimezone(new DateTimeZone('+0530'))->format('d F y, H:i:s');
                                             } else {
-                                                date_default_timezone_set('UTC');
-                                                $date = strtotime($userDetails['user_img_modification_date']);
-                                                date_default_timezone_set('Asia/Kolkata');
-                                                echo date("d F Y, H:i:s", $date);
+                                                $date = new DateTime($userDetails['user_img_modification_date'], new DateTimeZone('UTC'));
+                                                echo $date->setTimezone(new DateTimeZone('+0530'))->format('d F y, H:i:s');
                                             }
                                             ?>
                                         </dd>

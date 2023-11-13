@@ -80,11 +80,10 @@
                                         <dl class="text-sm flex flex-col items-center">
                                             <div class="flex gap-2">
                                                 <dt class="font-medium">Picture Uploaded:</dt>
-                                                <dd><?php
-                                                    date_default_timezone_set('UTC');
-                                                    $date = strtotime($_GET['imageUploadDate']);
-                                                    date_default_timezone_set('Asia/Kolkata');
-                                                    echo date("d F Y, H:i:s", $date);
+                                                <dd>
+                                                    <?php
+                                                    $date = new DateTime($_GET['imageUploadDate'], new DateTimeZone('UTC'));
+                                                    echo $date->setTimezone(new DateTimeZone('+0530'))->format('d F y, H:i:s');
                                                     ?>
                                                 </dd>
                                             </div>
@@ -92,11 +91,10 @@
                                                 <dt class="font-medium">Last Changed:</dt>
                                                 <dd>
                                                     <?php
-                                                    date_default_timezone_set('UTC');
-                                                    $date = strtotime($_GET['imageChangeDate']);
-                                                    date_default_timezone_set('Asia/Kolkata');
-                                                    echo date("d F Y, H:i:s", $date);
-                                                    ?>    
+                                                    $date = new DateTime($_GET['imageChangeDate'], new DateTimeZone('UTC'));
+                                                    echo $date->setTimezone(new DateTimeZone('+0530'))->format('d F y, H:i:s');
+                                                    ?>
+                                                </dd>
                                             </div>
                                         </dl>
                                     </figcaption>
