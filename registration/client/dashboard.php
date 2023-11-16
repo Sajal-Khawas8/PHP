@@ -394,7 +394,11 @@ if (!isset($_SESSION['loginName'])) {
                                     </button>
                                 </form>
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
-                                    <input type="hidden" name="id" value="<?= $userDetails['id']; ?>">
+                                    <input type="hidden" name="id" value="
+                                    <?php
+                                    $config=require "../server/config.php";
+                                    echo openssl_encrypt($userDetails['id'], $config['openssl']['algo'], $config['openssl']['pass'], 0, $config['openssl']['iv']);
+                                    ?>">
                                     <button name="editData" <?= ($userDetails['locked'] && !$isCurrentUser) ? 'disabled' : '' ?> class="disabled:text-gray-400">
                                         <svg class="w-6 h-6" height="24" width="24" xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 24 24" fill="currentColor">

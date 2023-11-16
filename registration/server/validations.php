@@ -220,6 +220,11 @@ class ValidateData
         }
         $query = new DatabaseQuery();
         $accountPassword = $query->selectColumn('password', 'users', $id);
+        if (!$accountPassword) {
+            unset($_SESSION['loginName']);
+            header("Location: ../client/index.php");
+            exit;
+        }
         if (!$this->validatePassword($accountPassword, $data)) {
             $isDataValid = false;
             return "Incorrect Password";
@@ -244,7 +249,7 @@ class ValidateData
         }
     }
 
-    public function validateLoginDataAndSearchUser(&$loginName, &$loginNameErr = null, $loginPassword=null, &$loginPasswordErr = null)
+    public function validateLoginDataAndSearchUser(&$loginName, &$loginNameErr = null, $loginPassword = null, &$loginPasswordErr = null)
     {
         $this->cleanData($loginName);
         $loginName = strtolower($loginName);

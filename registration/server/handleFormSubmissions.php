@@ -40,8 +40,19 @@ if (isset($_POST['unlockUser'])) {
 
 //Handle Edit Button
 if (isset($_POST['editData'])) {
+    $config=require "../server/config.php";
+    $id=openssl_decrypt($_POST['id'], $config['openssl']['algo'], $config['openssl']['pass'], 0, $config['openssl']['iv']);
+    if (!$id) {
+        header("Location: ../client/dashboard.php");
+        exit;
+    }
     $query = new DatabaseQuery();
-    $data = $query->selectUserJoin('users', 'id', 'user_img', 'user_id', '*', $_POST['id']);
+    $data = $query->selectUserJoin('users', 'id', 'user_img', 'user_id', '*', $id);
+    if (!$data) {
+        unset($_SESSION['loginName']);
+        header("Location: ../client/dashboard.php");
+        exit;
+    }
     header("Location: ../client/updateForm.php?id={$data['id']}&name={$data['name']}&uname={$data['username']}&gender={$data['gender']}&email={$data['email']}&phone={$data['phone']}&imageName={$data['display_name']}&image={$data['unique_name']}&imageUploadDate={$data['user_img_creation_date']}&imageChangeDate={$data['user_img_modification_date']}");
     exit;
 }
