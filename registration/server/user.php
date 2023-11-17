@@ -76,10 +76,10 @@ class User
         }
     }
 
-    public function removeUser()
+    public function removeUser($id)
     {
         $query = new DatabaseQuery();
-        $query->delete('users', 'email', $_SESSION['loginName']);
+        $query->delete('users', $id);
         unset($_SESSION['loginName']);
         header("Location: ../client/index.php");
         exit;

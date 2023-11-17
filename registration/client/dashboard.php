@@ -244,11 +244,6 @@ if (!isset($_SESSION['loginName'])) {
     <main class="flex-1 bg-gray-100 overflow-x-hidden overflow-y-auto">
         <header class="flex justify-between items-center text-sm py-2.5 px-6">
             <?php
-            // $sql = "SELECT name, unique_name FROM `users` LEFT JOIN `user_img` ON `users`.`id` = `user_img`.`user_id` WHERE email='{$_SESSION['loginName']}'";
-            // $result = $conn->query($sql);
-            // if (!$result) {
-            //     die("Error searching user: " . $conn->error);
-            // }
             $query = new DatabaseQuery();
             $result = $query->selectUserJoin('users', 'id', 'user_img', 'user_id', 'name, unique_name', $_SESSION['loginName'], 'email');
             $name = $result['name'];
@@ -293,6 +288,7 @@ if (!isset($_SESSION['loginName'])) {
 
             <ul class="px-6 space-y-4">
                 <?php
+                $config = require "../server/config.php";
                 $query = new DatabaseQuery();
                 $users = $query->selectAllUsersJoin('users', 'id', 'user_img', 'user_id');
                 foreach ($users as $userDetails):
@@ -379,7 +375,15 @@ if (!isset($_SESSION['loginName'])) {
                             </div>
                             <div class="flex items-center justify-end gap-12 text-sm text-center">
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
-                                    <input type="hidden" name="id" value="<?= $userDetails['id']; ?>">
+                                    <input type="hidden" name="id" value="
+                                    <?php
+                                    if ($isCurrentUser) {
+                                        echo openssl_encrypt($userDetails['id'], $config['openssl']['algo'], $config['openssl']['pass'], 0, $config['openssl']['iv']);
+                                    } else {
+                                        echo "";
+                                    }
+                                    ?>
+                                    ">
                                     <button name="<?= $userDetails['locked'] ? 'unlockUser' : 'lockUser'; ?>"
                                         id="lockUnlockUser" <?= (!$isCurrentUser) ? 'disabled' : '' ?>
                                         class="disabled:text-gray-400">
@@ -396,9 +400,13 @@ if (!isset($_SESSION['loginName'])) {
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post">
                                     <input type="hidden" name="id" value="
                                     <?php
-                                    $config=require "../server/config.php";
-                                    echo openssl_encrypt($userDetails['id'], $config['openssl']['algo'], $config['openssl']['pass'], 0, $config['openssl']['iv']);
-                                    ?>">
+                                    if ($isCurrentUser || !$userDetails['locked']) {
+                                        echo openssl_encrypt($userDetails['id'], $config['openssl']['algo'], $config['openssl']['pass'], 0, $config['openssl']['iv']);
+                                    } else {
+                                        echo "";
+                                    }
+                                    ?>
+                                    ">
                                     <button name="editData" <?= ($userDetails['locked'] && !$isCurrentUser) ? 'disabled' : '' ?> class="disabled:text-gray-400">
                                         <svg class="w-6 h-6" height="24" width="24" xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 24 24" fill="currentColor">
@@ -410,6 +418,15 @@ if (!isset($_SESSION['loginName'])) {
                                     </button>
                                 </form>
                                 <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="post" class="">
+                                    <input type="hidden" name="id" value="
+                                    <?php
+                                    if ($isCurrentUser) {
+                                        echo openssl_encrypt($userDetails['id'], $config['openssl']['algo'], $config['openssl']['pass'], 0, $config['openssl']['iv']);
+                                    } else {
+                                        echo "";
+                                    }
+                                    ?>
+                                    ">
                                     <button name="deleteUser" id="deleteUser" <?= (!$isCurrentUser) ? 'disabled' : '' ?>
                                         class="text-red-600 disabled:text-red-200">
                                         <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"

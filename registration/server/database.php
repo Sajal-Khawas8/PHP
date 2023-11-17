@@ -42,7 +42,7 @@ interface CRUD
 {
     public function add($table, $data);
     public function update($table, $updateStr, $searchId, $searchCriteria='id');
-    public function delete($table, $criteria, $id);
+    public function delete($table, $id, $criteria='id');
     public function selectAllUsers($table);
     public function selectUser($table, $id);
     public function selectColumn($column, $table, $searchId, $searchCriteria);
@@ -71,7 +71,7 @@ class DatabaseQuery implements CRUD
             die("Error locking user: " . $this->conn->error);
         }
     }
-    public function delete($table, $criteria, $id)
+    public function delete($table, $id, $criteria='id')
     {
         $sql = "DELETE FROM $table WHERE $criteria='$id'";
         if (!$this->conn->query($sql)) {

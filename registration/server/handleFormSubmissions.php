@@ -5,8 +5,8 @@ require "../server/bootstrap.php";
 
 // Handle Registration Form
 if (isset($_POST['register'])) {
-    $user=new User();
-    $registrationErr=$user->addUser($_POST);
+    $user = new User();
+    $registrationErr = $user->addUser($_POST);
 }
 
 // Handle Login Form
@@ -28,44 +28,63 @@ if (isset($_POST['logout'])) {
 
 //Handle Lock Button
 if (isset($_POST['lockUser'])) {
-    $query = new DatabaseQuery();
-    $query->update('users', 'locked=true', $_SESSION['loginName'], 'email');
+    $validation = new ValidateData();
+    if ($id = $validation->validateId($_POST['id'])) {
+        $query = new DatabaseQuery();
+        $query->update('users', 'locked=true', $id);
+    } else {
+        header("Location: ../client/dashboard.php");
+        exit;
+    }
 }
 
 //Handle Unlock Button
 if (isset($_POST['unlockUser'])) {
-    $query = new DatabaseQuery();
-    $query->update('users', 'locked=false', $_SESSION['loginName'], 'email');
+    $validation = new ValidateData();
+    if ($id = $validation->validateId($_POST['id'])) {
+        $query = new DatabaseQuery();
+        $query->update('users', 'locked=false', $id);
+    } else {
+        header("Location: ../client/dashboard.php");
+        exit;
+    }
 }
 
 //Handle Edit Button
 if (isset($_POST['editData'])) {
-    $config=require "../server/config.php";
-    $id=openssl_decrypt($_POST['id'], $config['openssl']['algo'], $config['openssl']['pass'], 0, $config['openssl']['iv']);
-    if (!$id) {
+    $validation = new ValidateData();
+    if ($id = $validation->validateId($_POST['id'])) {
+        $query = new DatabaseQuery();
+        $data = $query->selectUserJoin('users', 'id', 'user_img', 'user_id', '*', $id);
+        if (!$data) {
+            unset($_SESSION['loginName']);
+            header("Location: ../client/dashboard.php");
+            exit;
+        }
+        header("Location: ../client/updateForm.php?id={$data['id']}&name={$data['name']}&uname={$data['username']}&gender={$data['gender']}&email={$data['email']}&phone={$data['phone']}&imageName={$data['display_name']}&image={$data['unique_name']}&imageUploadDate={$data['user_img_creation_date']}&imageChangeDate={$data['user_img_modification_date']}");
+        exit;
+    } else {
         header("Location: ../client/dashboard.php");
         exit;
     }
-    $query = new DatabaseQuery();
-    $data = $query->selectUserJoin('users', 'id', 'user_img', 'user_id', '*', $id);
-    if (!$data) {
-        unset($_SESSION['loginName']);
-        header("Location: ../client/dashboard.php");
-        exit;
-    }
-    header("Location: ../client/updateForm.php?id={$data['id']}&name={$data['name']}&uname={$data['username']}&gender={$data['gender']}&email={$data['email']}&phone={$data['phone']}&imageName={$data['display_name']}&image={$data['unique_name']}&imageUploadDate={$data['user_img_creation_date']}&imageChangeDate={$data['user_img_modification_date']}");
-    exit;
 }
 
 //Handle Delete Button
 if (isset($_POST['deleteUser'])) {
-    $user=new User();
-    $user->removeUser();
+    $validation = new ValidateData();
+    if ($id = $validation->validateId($_POST['id'])) {
+        $user = new User();
+        $user->removeUser($id);
+    } else {
+        header("Location: ../client/dashboard.php");
+        exit;
+    }
+
 }
 
 // Handle Update Form
 if (isset($_POST['update'])) {
-    $user=new User();
+    $user = new User();
     $updationErr = $user->updateUser($_POST);
 }
 
@@ -73,10 +92,10 @@ if (isset($_POST['update'])) {
 if (isset($_POST['searchUser'])) {
     $isSearchErr = false;
     $searchErr;
-    $validate=new ValidateData();
+    $validate = new ValidateData();
     $searchEmail = $validate->validateLoginDataAndSearchUser($_POST['searchData'], $searchErr);
     if ($searchErr !== null) {
-        $isSearchErr=true;
+        $isSearchErr = true;
     }
 }
 ?>

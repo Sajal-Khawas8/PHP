@@ -295,4 +295,15 @@ class ValidateData
         $loginName = $email;
         return TRUE;
     }
+
+    public function validateId($id)
+    {
+        $config = require "../server/config.php";
+        $id = openssl_decrypt($id, $config['openssl']['algo'], $config['openssl']['pass'], 0, $config['openssl']['iv']);
+        if (!$id) {
+            return false;
+        } else {
+            return $id;
+        }
+    }
 }
