@@ -1,10 +1,25 @@
 <?php
 
-// require "../server/database.php";
-
+/**
+ * This class is responsible for sanitizing and validating the input data
+ * It contains all the methods for validating the input data
+ * It also contains a method 'validateLoginDataAndSearchUser' which searches a user and returns the email for search utility
+ */
 class ValidateData
 {
+    /**
+     * Uses the Connection trait from 'database.php' file which performs following functions:
+     * 1. Establishes connection with the database (through constructor)
+     * 2. Closes the connection after opertion (through destructor)
+     */
     use Connection;
+
+    /**
+     * Sanitizes the input data.
+     * It removes the white spaces, slashes and removes special characters
+     * @param string $data The input data from the form 
+     * @return void
+     */
     private function cleanData(&$data)
     {
         $data = trim($data);
@@ -12,6 +27,14 @@ class ValidateData
         $data = htmlspecialchars($data);
     }
 
+    /**
+     * Checks if the input data is empty or not and sets the error message.
+     * 
+     * @param string $data The input data that is to be checked
+     * @param string $msg The variable to contain the error message if data is empty
+     * @param string $field The type of input field which is to be checked
+     * @return bool Returns True if the data is empty, false otherwise
+     */
     private function isEmpty($data, &$msg, $field)
     {
         if (empty($data)) {
@@ -20,6 +43,14 @@ class ValidateData
         }
     }
 
+    /**
+     * Checks if the input data contains atleast 3 characters or not
+     * 
+     * @param string $data The input data that is to be checked
+     * @param string $msg The variable to contain the error message if data does not contain atleast 3 characters
+     * @param string $field The type of input field which is to be checked
+     * @return bool Returns True if the data does not contain atleast 3 characters, false otherwise
+     */
     private function isInvalidMinLength($data, &$msg, $field)
     {
         if (strlen($data) < 3) {
@@ -28,6 +59,14 @@ class ValidateData
         }
     }
 
+    /**
+     * Checks if the input data contains more than 15 characters or not
+     * 
+     * @param string $data The input data that is to be checked
+     * @param string $msg The variable to contain the error message if data contains more than 15 characters
+     * @param string $field The type of input field which is to be checked
+     * @return bool Returns True if the data contains more than 15 characters, false otherwise
+     */
     private function isInvalidMaxLength($data, &$msg, $field)
     {
         if (strlen($data) > 15) {
@@ -36,6 +75,14 @@ class ValidateData
         }
     }
 
+    /**
+     * Checks if the format of input data is valid or not
+     * 
+     * @param string $data The input data that is to be checked
+     * @param string $msg The variable to contain the error message if data is not in valid form
+     * @param string $field The type of input field which is to be checked
+     * @return bool Returns True if the data is not in valid form, false otherwise
+     */
     private function isInvalidFormat($data, &$msg, $field)
     {
         $field = strtok($field, " ");
@@ -79,6 +126,14 @@ class ValidateData
 
     }
 
+    /**
+     * Checks if the input data is already present in the database or not
+     * 
+     * @param string $data The input data that is to be checked
+     * @param string $msg The variable to contain the error message if data is already present in the database
+     * @param string $field The type of input field which is to be checked
+     * @return bool Returns True if the data is already present in the database, false otherwise
+     */
     private function isRedundantData($data, &$msg, $field, $dataType, $userId = null)
     {
         $query = new DatabaseQuery();
@@ -89,11 +144,26 @@ class ValidateData
         }
     }
 
+    /**
+     * Checks if the two passwords are same or not
+     * 
+     * @param string $firstPassword First password for comparison
+     * @param string $$secondPassword Second password for comparison
+     * @return bool Returns True if the passwords match, false otherwise
+     */
     private function validatePassword($firstPassword, $secondPassword)
     {
         return ($firstPassword === $secondPassword);
     }
 
+    /**
+     * santizes and Checks if the input text data is valid or not
+     * It checks for empty value, minimum length, maximum length and format of data
+     * 
+     * @param string $data The input data that is to be checked
+     * @param bool $isDataValid The variable to track if the data is valid or not
+     * @return string|null Returns the error message if the data is not valid, or null otherwise
+     */
     public function validateTextData(&$data, &$isDataValid)
     {
         $this->cleanData($data);
@@ -105,6 +175,15 @@ class ValidateData
         }
     }
 
+    /**
+     * Sanitizes and Checks if the username is valid or not
+     * It checks for empty value, minimum length, maximum length, format and redundancy of username
+     * It also converts the username to lowercase
+     * 
+     * @param string $data The input username that is to be checked
+     * @param bool $isDataValid The variable to track if the username is valid or not
+     * @return string|null Returns the error message if the username is not valid, or null otherwise
+     */
     public function validateUsername(&$data, &$isDataValid)
     {
         $this->cleanData($data);
@@ -116,6 +195,13 @@ class ValidateData
         }
     }
 
+    /**
+     * Checks if the user has selected gender or not
+     * 
+     * @param string|null $data The input gender that user selected or null if user has not selected any option
+     * @param bool $isDataValid The variable to track if user has selected gender or not
+     * @return string|null Returns the error message if the user has not selected gender, or null otherwise
+     */
     public function validateGender($data, &$isDataValid)
     {
         if (!isset($data)) {
@@ -124,6 +210,15 @@ class ValidateData
         }
     }
 
+    /**
+     * Sanitizes and Checks if the email is valid or not
+     * It checks for format and redundancy of email
+     * It also converts the email to lowercase
+     * 
+     * @param string $data The input email that is to be checked
+     * @param bool $isDataValid The variable to track if the email is valid or not
+     * @return string|null Returns the error message if the email is not valid, or null otherwise
+     */
     public function validateEmail(&$data, &$isDataValid)
     {
         $this->cleanData($data);
@@ -135,6 +230,14 @@ class ValidateData
         }
     }
 
+    /**
+     * Checks if the phone number is valid or not
+     * It checks for format and redundancy of phone number
+     * 
+     * @param string $data The input phone number that is to be checked
+     * @param bool $isDataValid The variable to track if the phone number is valid or not
+     * @return string|null Returns the error message if the phone number is not valid, or null otherwise
+     */
     public function validatePhoneNumber(&$data, &$isDataValid)
     {
         $this->cleanData($data);
@@ -145,6 +248,14 @@ class ValidateData
         }
     }
 
+    /**
+     * Checks if the password is in valid format or not
+     * It checks for empty value and format of password
+     * 
+     * @param string $data The input password that is to be checked
+     * @param bool $isDataValid The variable to track if the password is in valid format or not
+     * @return string|null Returns the error message if the password is not in valid format, or null otherwise
+     */
     public function validatePasswordFormat(&$data, &$isDataValid)
     {
         $this->cleanData($data);
@@ -155,6 +266,14 @@ class ValidateData
         }
     }
 
+    /**
+     * Checks if the confirm password is valid or not
+     * It checks if the field is empty and if the confirm password matches with the actual password
+     * 
+     * @param string $data The input confirm password that is to be checked
+     * @param bool $isDataValid The variable to track if the confirm password is valid or not
+     * @return string|null Returns the error message if the confirm pasword is not valid, or null otherwise
+     */
     public function validateCnfrmPassword($cnfrmPassword, $password, &$isDataValid)
     {
         $this->cleanData($cnfrmPassword);
@@ -249,7 +368,15 @@ class ValidateData
         }
     }
 
-    public function validateLoginDataAndSearchUser(&$loginName, &$loginNameErr = null, $loginPassword = null, &$loginPasswordErr = null)
+    /**
+     * valifate
+     * frscri[yop]
+     * @param $loginName string || NUll
+     * @return mixed
+     * 
+     **/
+
+    public function validateLoginDataAndSearchUser(&$loginName, &$loginNameErr = null, $loginPassword = null, &$loginPasswordErr = null)    //false|email
     {
         $this->cleanData($loginName);
         $loginName = strtolower($loginName);
